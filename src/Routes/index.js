@@ -1,12 +1,10 @@
 // HeaderOnly Layout
-import Profile from "~/pages/Profile"
+import Product from '~/pages/Product';
 
 //Public Routes
-const publicRoutes =[
-    {path: '/profile' , component: Profile },
-]
+const publicRoutes = [{ path: '/product', component: Product }];
 
 //Private Routers
-const privateRoutes =[]
+const privateRoutes = [];
 
-export {publicRoutes, privateRoutes}
+export { publicRoutes, privateRoutes };

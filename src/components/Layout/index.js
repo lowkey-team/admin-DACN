@@ -34,7 +34,7 @@ const getTextColor = (backgroundColor) => {
     return darkColors.includes(backgroundColor) ? '#fff' : '#000';
 };
 
-const App = () => {
+const App = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [selectedColor, setSelectedColor] = useState('#9CD3D8');
     const [selectedKey, setSelectedKey] = useState(null);
@@ -55,14 +55,12 @@ const App = () => {
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider trigger={null} collapsible collapsed={collapsed} style={{ backgroundColor: selectedColor }}>
-                <div className={cx('logo')}>
-                    Logo
-                </div>
+                <div className={cx('logo')}>Logo</div>
                 <Menu
                     mode="inline"
                     defaultSelectedKeys={['1']}
                     style={{ backgroundColor: selectedColor }}
-                    popupStyle={{ backgroundColor: selectedColor }} 
+                    popupStyle={{ backgroundColor: selectedColor }}
                 >
                     <Menu.Item
                         key="1"
@@ -189,13 +187,13 @@ const App = () => {
                             fontSize: '16px',
                             width: 64,
                             height: 64,
-                            color: "black",
+                            color: 'black',
                         }}
                     />
                     <Dropdown
                         overlay={
                             <Menu>
-                                {colorOptions.map(option => (
+                                {colorOptions.map((option) => (
                                     <Menu.Item key={option.value} onClick={() => handleColorChange(option.value)}>
                                         <div style={{ backgroundColor: option.value, padding: '8px', color: '#fff' }}>
                                             {option.name}
@@ -217,7 +215,7 @@ const App = () => {
                         borderRadius: borderRadiusLG,
                     }}
                 >
-                    {/* Content goes here */}
+                    {children}
                 </Content>
             </Layout>
         </Layout>
