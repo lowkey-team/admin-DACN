@@ -1,42 +1,13 @@
-@import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
-:root{
-    --fontText: 'Montserrat', sans-serif;
-    --primary: #960304;
-    --btnPrimary: ;
-    --TextPrimary: #960304;
-    --text: #ffffff;
-    --sizeText: 24px;
-    --sizeTextTitle: 34px;
-    --sizeTextTablet: 20px;
-    --sizeTextTitleTablet: 30px;
-}
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-html{
-    font-size: 62.5%;
-}
-body{
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.5em;
-    margin: 0;
-    padding: 0;
-    background-color: var(--primary) !important;
+.wrapper {
+    min-height: 100vh;
+    .btn-OutLined {
+        font-size: 16px;
+        width: 64px;
+        height: 64px;
+        color: black;
+    }
 }
 
-button,input[tabindex]{
-    outline: none;
-    border: none;
-}
-
-a[href]{
-    color: var(--text);
-    text-decoration: none;
-}
 .logo {
     height: 44px;
     margin: 14px;
@@ -51,16 +22,20 @@ a[href]{
 }
 
 .custom-menu-item {
-    color: #cb0101; 
+    color: #cb0101;
     transition: background-color 0.3s ease;
 
     &.selected {
         background-color: #107993;
-        color: #ffffff; 
+        color: #ffffff;
     }
 
     &:hover {
         background-color: #2ea9c8;
     }
 }
-
+.content {
+    margin: 10px 10px;
+    padding: 24px;
+    min-height: 280px;
+}

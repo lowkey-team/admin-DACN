@@ -53,7 +53,7 @@ const App = ({ children }) => {
     const textColor = getTextColor(selectedColor);
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
+        <Layout className={cx('wrapper')}>
             <Sider trigger={null} collapsible collapsed={collapsed} style={{ backgroundColor: selectedColor }}>
                 <div className={cx('logo')}>Logo</div>
                 <Menu
@@ -182,13 +182,8 @@ const App = ({ children }) => {
                     <Button
                         type="text"
                         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        className={cx('btn-OutLined')}
                         onClick={() => setCollapsed(!collapsed)}
-                        style={{
-                            fontSize: '16px',
-                            width: 64,
-                            height: 64,
-                            color: 'black',
-                        }}
                     />
                     <Dropdown
                         overlay={
@@ -207,10 +202,8 @@ const App = ({ children }) => {
                     </Dropdown>
                 </Header>
                 <Content
+                    className={cx('content')}
                     style={{
-                        margin: '24px 16px',
-                        padding: 24,
-                        minHeight: 280,
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,
                     }}
