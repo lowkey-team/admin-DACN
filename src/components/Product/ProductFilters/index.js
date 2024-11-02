@@ -1,6 +1,6 @@
 // ProductFilters.js
 import React from 'react';
-import { Input, Row as AntRow, Col, Select } from 'antd';
+import { Input, Row as AntRow, Col, Select, Tooltip } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -21,21 +21,30 @@ export default function ProductFilters({
         <AntRow gutter={[16, 16]} style={{ marginBottom: '16px' }}>
             <Col span={8}>
                 <Input
-                    placeholder="Tìm kiếm sản phẩm"
+                    placeholder="Search by product name"
                     prefix={<SearchOutlined />}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </Col>
             <Col span={14}>
-                <AntRow>
+                <AntRow gutter={16}>
                     <Col>
                         <Select
-                            style={{ minWidth: 100 }}
+                            style={{ minWidth: 150 }}
                             mode="multiple"
-                            placeholder="Danh mục"
+                            placeholder="Category Name"
                             value={selectedCategories}
                             onChange={setSelectedCategories}
                             allowClear
+                            maxTagCount={2}
+                            maxTagPlaceholder={(omittedValues) => {
+                                console.log('Omitted Values:', omittedValues);
+                                return (
+                                    <Tooltip title={omittedValues.map((item) => item.label).join(', ')}>
+                                        <span>{`${omittedValues.length} ...`}</span>
+                                    </Tooltip>
+                                );
+                            }}
                         >
                             {categories.map((category) => (
                                 <Option key={category} value={category}>
@@ -48,10 +57,19 @@ export default function ProductFilters({
                         <Select
                             style={{ minWidth: 150 }}
                             mode="multiple"
-                            placeholder="Danh mục con"
+                            placeholder="Sup category"
                             value={selectedSubcategories}
                             onChange={setSelectedSubcategories}
                             allowClear
+                            maxTagCount={2}
+                            maxTagPlaceholder={(omittedValues) => {
+                                console.log('Omitted Values:', omittedValues);
+                                return (
+                                    <Tooltip title={omittedValues.map((item) => item.label).join(', ')}>
+                                        <span>{`${omittedValues.length} ...`}</span>
+                                    </Tooltip>
+                                );
+                            }}
                         >
                             {Object.entries(subcategories).map(([category, subs]) =>
                                 selectedCategories.includes(category)

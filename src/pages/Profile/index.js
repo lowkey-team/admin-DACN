@@ -1,9 +1,16 @@
-// TableCollapsibleRow.js
 import React, { useEffect, useState } from 'react';
-import { Pagination } from 'antd';
+import { Pagination, Button, Row as AntRow, Col } from 'antd';
+import classNames from 'classnames/bind';
 import { fetchProductAllAPI, fetchCategoryAPI } from '~/apis/ProductAPI';
 import ProductFilters from '~/components/Product/ProductFilters';
 import ProductTable from '~/components/Product/ProductTable';
+import style from './Product.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { exportToExcel } from '~/utils/excelUtils';
+import ProductFormModal from '~/components/Product/ProductFormModal';
+
+const cx = classNames.bind(style);
 
 export default function TableCollapsibleRow() {
     const [rows, setRows] = useState([]);
@@ -14,6 +21,15 @@ export default function TableCollapsibleRow() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const hideModal = () => {
+        setIsModalOpen(false);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -54,6 +70,34 @@ export default function TableCollapsibleRow() {
 
     return (
         <>
+            <AntRow>
+                <Col span={15}>
+                    <p className={cx('Title')}>Product List</p>
+                </Col>
+                <Col span={3} className={cx('btn-create')}>
+                    <Button
+                        className={cx('btn-ExportToExcel')}
+                        icon={<FontAwesomeIcon icon={faFileExcel} />}
+                        onClick={() => exportToExcel(currentRows)}
+                    >
+                        Import to Excel
+                    </Button>
+                </Col>
+                <Col span={3} className={cx('btn-create')}>
+                    <Button
+                        className={cx('btn-ExportToExcel')}
+                        icon={<FontAwesomeIcon icon={faFileExcel} />}
+                        onClick={() => exportToExcel(currentRows)}
+                    >
+                        Export to Excel
+                    </Button>
+                </Col>
+                <Col span={3} className={cx('btn-create')}>
+                    <Button type="primary" icon={<FontAwesomeIcon icon={faPlus} />} onClick={showModal}>
+                        Create Product
+                    </Button>
+                </Col>
+            </AntRow>
             <ProductFilters
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
@@ -74,6 +118,7 @@ export default function TableCollapsibleRow() {
                 onChange={(page) => setCurrentPage(page)}
                 style={{ marginTop: '16px', textAlign: 'right' }}
             />
+            <ProductFormModal open={isModalOpen} onClose={hideModal} />
         </>
     );
 }

@@ -3,6 +3,7 @@ import React from 'react';
 import Table from '@mui/joy/Table';
 import Sheet from '@mui/joy/Sheet';
 import ProductRow from '../ProductRow';
+import { Button } from 'antd/es/radio';
 
 export default function ProductTable({ currentRows }) {
     return (
@@ -23,10 +24,11 @@ export default function ProductTable({ currentRows }) {
                     <tr>
                         <th style={{ width: 40 }} aria-label="empty" />
                         <th style={{ width: 50 }}></th>
-                        <th style={{ display: 'flex', justifyContent: 'start' }}>Tên sản phẩm</th>
-                        <th>Danh mục</th>
-                        <th>Danh mục con</th>
-                        <th>Ngày tạo</th>
+                        <th style={{ display: 'flex', justifyContent: 'start' }}>Product Name</th>
+                        <th>Category</th>
+                        <th>Sup Category</th>
+                        <th>CreatedAt</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>

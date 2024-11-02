@@ -7,10 +7,20 @@ import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { formatDateTime } from '~/utils/dateUtils';
+import { Button } from 'antd';
+import ProductDetailModal from '../ProductDetailModal';
 
 export default function ProductRow({ row, initialOpen = false }) {
     const [open, setOpen] = useState(initialOpen);
+    const [modalVisible, setModalVisible] = useState(false);
 
+    const handleShowModal = () => {
+        setModalVisible(true);
+    };
+
+    const handleHideModal = () => {
+        setModalVisible(false);
+    };
     return (
         <>
             <tr>
@@ -32,9 +42,21 @@ export default function ProductRow({ row, initialOpen = false }) {
                 <td>{row.category_name}</td>
                 <td>{row.subcategory_name}</td>
                 <td>{formatDateTime(row.createdAt)}</td>
+                <td>
+                    <Button color="default" variant="dashed" onClick={handleShowModal} productID={row.id}>
+                        Detail
+                    </Button>
+
+                    <Button color="default" variant="dashed">
+                        Edit
+                    </Button>
+                    <Button color="default" variant="dashed">
+                        Delete
+                    </Button>
+                </td>
             </tr>
             <tr>
-                <td style={{ height: 0, padding: 0 }} colSpan={6}>
+                <td style={{ height: 0, padding: 0 }} colSpan={7}>
                     {open && (
                         <Sheet variant="soft" sx={{ p: 1, pl: 6, boxShadow: 'inset 0 3px 6px 0 rgba(0 0 0 / 0.08)' }}>
                             <Typography level="body-lg" component="div">
@@ -74,6 +96,8 @@ export default function ProductRow({ row, initialOpen = false }) {
                     )}
                 </td>
             </tr>
+
+            <ProductDetailModal productID={row.product_id} open={modalVisible} onClose={handleHideModal} />
         </>
     );
 }
