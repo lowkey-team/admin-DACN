@@ -1,0 +1,16 @@
+.box-img_productItem {
+    width: 60px;
+    img {
+        width: 50px;
+        height: 50px;
+        border-radius: 3px;
+    }
+}
+.box-table {
+    width: 100%;
+    text-align: center;
+    tbody tr td {
+        vertical-align: middle; // Căn giữa theo chiều dọc
+        text-align: center;
+    }
+}
