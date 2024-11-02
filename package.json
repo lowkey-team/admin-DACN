@@ -11,13 +11,12 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "animate.css": "^4.1.1",
-    "antd": "^5.21.5",
+    "antd": "^5.21.6",
     "bootstrap": "^5.3.3",
     "classnames": "^2.5.1",
     "css-reset-and-normalize": "^2.3.6",
     "customize-cra": "^1.0.0",
     "react": "^18.3.1",
-    "react-app-rewired": "^2.2.1",
     "react-color": "^2.19.3",
     "react-dom": "^18.3.1",
     "react-responsive": "^10.0.0",
@@ -51,6 +50,7 @@
     ]
   },
   "devDependencies": {
-    "babel-plugin-module-resolver": "^5.0.2"
+    "babel-plugin-module-resolver": "^5.0.2",
+    "react-app-rewired": "^2.2.1"
   }
 }
