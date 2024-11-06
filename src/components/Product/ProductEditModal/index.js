@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Input, Button, Row as AntRow, Col, Upload, Image } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 import axios from 'axios';
 import classNames from 'classnames/bind';
-import style from './ProductFromMoal.module.scss';
+import style from './ProductEditMoal.module.scss';
 import SummernoteEditor from '~/components/Summernote';
-import { AddProductAPI } from '~/apis/ProductAPI';
+import { AddProductAPI, fetchProductByIdAPI, updateProductAPI } from '~/apis/ProductAPI';
 
 const cx = classNames.bind(style);
-
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -17,14 +17,17 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-function ProductFormModal({ open, onClose }) {
+function ProductEditModal({ open, onClose, productID }) {
     const [content, setContent] = useState('');
     const [fileList, setFileList] = useState([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    const [variants, setVariants] = useState([{ VariantName: '', Stock: '', Price: '', Discount: '' }]);
+    const [variants, setVariants] = useState([{ size: '', price: '', stock: '', discount: '' }]);
     const [productName, setProductName] = useState('');
     const [subCategory, setSubCategory] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [productDetails, setProductDetails] = useState(null);
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -37,7 +40,7 @@ function ProductFormModal({ open, onClose }) {
     const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
     const handleAddVariant = () => {
-        setVariants([...variants, { VariantName: '', Stock: '', Price: '', Discount: '' }]);
+        setVariants([...variants, { size: '', stock: '', price: '', discount: '' }]);
     };
 
     const handleRemoveVariant = (index) => {
@@ -50,55 +53,80 @@ function ProductFormModal({ open, onClose }) {
         setVariants(newVariants);
     };
 
-    const handleAddProduct = async () => {
-        const formData = new FormData();
+    useEffect(() => {
+        const fetchData = async () => {
+            if (open && productID) {
+                setLoading(true);
+                setError(null);
+                try {
+                    const data = await fetchProductByIdAPI(productID);
+                    console.log(data);
+                    setProductName(data.productName);
+                    setSubCategory(data.subcategory_name);
+                    setContent(data.description);
+                    setFileList(
+                        Array.isArray(data.images) ? data.images.map((image) => ({ url: image.image_url })) : [],
+                    );
+                    setVariants(
+                        data.variations.map((v) => ({
+                            size: v.size,
+                            price: v.price,
+                            stock: v.stock,
+                            discount: v.discount,
+                        })),
+                    );
+                } catch (error) {
+                    console.error('Lỗi khi tải dữ liệu sản phẩm:', error);
+                    setError('Không thể tải chi tiết sản phẩm.');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchData();
+    }, [open, productID]);
 
-        console.log('productName:', productName);
-        console.log('subCategory:', subCategory);
-        console.log('description:', content);
-
-        formData.append('productName', productName || '');
-        formData.append('ID_SupCategory', subCategory || '');
-        formData.append('description', content || '');
-
-        variants.forEach((variant, index) => {
-            console.log(`Variant ${index}:`, variant);
-            formData.append(`variants[${index}][VariantName]`, variant.VariantName || '');
-            formData.append(`variants[${index}][Stock]`, variant.Stock || '');
-            formData.append(`variants[${index}][Price]`, variant.Price || '');
-            formData.append(`variants[${index}][Discount]`, variant.Discount || '');
-        });
-
-        fileList.forEach((file) => {
-            console.log('File to upload:', file.originFileObj);
-            formData.append('images', file.originFileObj);
-        });
-
-        // Ghi lại dữ liệu trong formData
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-
+    const handleUpdateProduct = async () => {
+        setLoading(true);
         try {
-            const response = await AddProductAPI(formData);
-            message.success('Product added successfully');
-            console.log('Product added successfully:', response.data);
-            onClose();
+            const formData = new FormData();
+            formData.append('productName', productName);
+            formData.append('subCategory', subCategory);
+            formData.append('description', content);
+
+            fileList.forEach((file) => {
+                formData.append('images', file.originFileObj);
+            });
+            console.log('Dữ liệu sản phẩm sắp cập nhật:', {
+                productName,
+                subCategory,
+                description: content,
+                images: fileList.map((file) => file.originFileObj),
+                variants,
+            });
+
+            await updateProductAPI(productID, formData);
+            message.success('Cập nhật sản phẩm thành công!');
+            onClose(); // Đóng modal sau khi cập nhật
         } catch (error) {
-            console.error('Error adding product:', error.response ? error.response.data : error.message);
+            console.error('Lỗi khi cập nhật sản phẩm:', error.response ? error.response.data : error.message);
+            message.error('Cập nhật sản phẩm không thành công.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <Modal
-            title="Create Product"
+            title="Update Product"
             open={open}
-            onOk={handleAddProduct}
+            onOk={handleUpdateProduct}
             onCancel={onClose}
-            okText="+ Add Product"
+            okText="Update Product"
             cancelText="Cancel"
             className={cx('wrapper')}
             width={1100}
+            confirmLoading={loading}
         >
             <AntRow gutter={16}>
                 <Col span={16}>
@@ -121,7 +149,6 @@ function ProductFormModal({ open, onClose }) {
                                 placeholder="Sub Category"
                                 value={subCategory}
                                 onChange={(e) => setSubCategory(e.target.value)}
-                                type="number"
                             />
                         </Col>
                         <Col span={24} className={cx('box-content')}>
@@ -168,18 +195,18 @@ function ProductFormModal({ open, onClose }) {
                 {variants.map((variant, index) => (
                     <AntRow gutter={16} key={index} align="middle">
                         <Col span={7}>
-                            <p>Variant name</p>
+                            <p>Variant Size</p>
                             <Input
-                                value={variant.VariantName}
-                                onChange={(e) => handleVariantChange(index, 'VariantName', e.target.value)}
-                                placeholder="Variant name"
+                                value={variant.size}
+                                onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                                placeholder="Variant Size"
                             />
                         </Col>
                         <Col span={5}>
                             <p>Stock</p>
                             <Input
-                                value={variant.Stock}
-                                onChange={(e) => handleVariantChange(index, 'Stock', e.target.value)}
+                                value={variant.stock}
+                                onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
                                 placeholder="Stock"
                                 type="number"
                                 min={0}
@@ -188,37 +215,40 @@ function ProductFormModal({ open, onClose }) {
                         <Col span={5}>
                             <p>Price</p>
                             <Input
-                                value={variant.Price}
-                                onChange={(e) => handleVariantChange(index, 'Price', e.target.value)}
+                                value={variant.price}
+                                onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
                                 placeholder="Price"
                                 type="number"
                                 min={0}
                             />
                         </Col>
                         <Col span={5}>
-                            <p>Discount</p>
+                            <p>Discount (%)</p>
                             <Input
-                                value={variant.Discount}
-                                onChange={(e) => handleVariantChange(index, 'Discount', e.target.value)}
+                                value={variant.discount}
+                                onChange={(e) => handleVariantChange(index, 'discount', e.target.value)}
                                 placeholder="Discount"
+                                type="number"
+                                min={0}
                             />
                         </Col>
                         <Col span={2}>
                             <Button
-                                type="dashed"
-                                style={{ marginTop: '30px', color: 'red' }}
-                                onClick={() => handleRemoveVariant(index)}
+                                type="danger"
                                 icon={<DeleteOutlined />}
+                                onClick={() => handleRemoveVariant(index)}
+                                style={{ marginTop: '24px' }}
                             />
                         </Col>
                     </AntRow>
                 ))}
-                <Button type="dashed" onClick={handleAddVariant} style={{ width: '100%', marginTop: '10px' }}>
-                    <PlusOutlined /> Add Variant
+                <Button type="dashed" onClick={handleAddVariant} style={{ width: '100%', marginTop: '16px' }}>
+                    Add Variant
                 </Button>
             </div>
+            {error && <p className={cx('error-message')}>{error}</p>}
         </Modal>
     );
 }
 
-export default ProductFormModal;
+export default ProductEditModal;

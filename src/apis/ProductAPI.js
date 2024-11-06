@@ -7,6 +7,12 @@ export const fecthPorductAPI = async () => {
     return response.data;
 };
 
+// fetch product by id
+export const fetchProductByIdAPI = async (id) => {
+    const response = await axios.get(`${API_ROOT}/v1/product/${id}`);
+    return response.data;
+};
+
 export const fetchProductAllAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/product/getAll`);
     return response.data;
@@ -19,6 +25,13 @@ export const fetchCategoryAPI = async () => {
 
 export const AddProductAPI = async (formData) => {
     return await axios.post(`${API_ROOT}/v1/product`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+export const updateProductAPI = async (id, formData) => {
+    return await axios.put(`${API_ROOT}/v1/product/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

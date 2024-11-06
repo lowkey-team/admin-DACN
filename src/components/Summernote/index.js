@@ -15,16 +15,18 @@ const SummernoteEditor = ({ content, setContent }) => {
         $(editorRef.current).summernote({
             height: 'auto',
             minHeight: 100,
-            maxHeight: 200,
+            maxHeight: 500,
             toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['strikethrough', 'superscript', 'subscript']],
-                ['fontname', ['fontname']],
+                ['style', ['style', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                ['font', ['fontname', 'fontsize', 'fontsizeunit']],
                 ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['height', ['height']],
-                ['view', ['codeview', 'help']],
+                ['para', ['ul', 'ol', 'paragraph', 'height', 'align']],
+                ['table', ['table']], // Chức năng bảng
+                ['insert', ['link', 'picture', 'video', 'hr']],
+                ['view', ['fullscreen', 'codeview', 'help']],
+                ['history', ['undo', 'redo']],
             ],
+            fontNames: ['Arial', 'Times New Roman', 'Courier New', 'Comic Sans MS', 'Helvetica', 'Roboto'],
             callbacks: {
                 onChange: (contents) => {
                     // Ghi nhớ nội dung trong Summernote nhưng không cập nhật ngay
