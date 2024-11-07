@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Input, Button, Row as AntRow, Col, Upload, Image } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { message } from 'antd';
-import axios from 'axios';
 import classNames from 'classnames/bind';
 import style from './ProductEditMoal.module.scss';
 import SummernoteEditor from '~/components/Summernote';
-import { AddProductAPI, fetchProductByIdAPI, updateProductAPI } from '~/apis/ProductAPI';
+import { addImageAPI, fetchProductByIdAPI, removeImageAPI, updateProductAPI } from '~/apis/ProductAPI';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -22,12 +21,13 @@ function ProductEditModal({ open, onClose, productID }) {
     const [fileList, setFileList] = useState([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    const [variants, setVariants] = useState([{ size: '', price: '', stock: '', discount: '' }]);
+    const [variants, setVariants] = useState([]);
     const [productName, setProductName] = useState('');
     const [subCategory, setSubCategory] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [productDetails, setProductDetails] = useState(null);
+    const [newFiles, setNewFiles] = useState([]);
+    const [idImgDeleted, setIdImgDeleted] = useState([]);
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -36,8 +36,6 @@ function ProductEditModal({ open, onClose, productID }) {
         setPreviewImage(file.url || file.preview);
         setPreviewOpen(true);
     };
-
-    const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
     const handleAddVariant = () => {
         setVariants([...variants, { size: '', stock: '', price: '', discount: '' }]);
@@ -53,6 +51,20 @@ function ProductEditModal({ open, onClose, productID }) {
         setVariants(newVariants);
     };
 
+    const handleChange = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+        const uploadingFiles = newFileList.filter((file) => file.status === 'uploading');
+        setNewFiles(uploadingFiles);
+    };
+
+    const handleRemoveImage = (file) => {
+        setIdImgDeleted((prevIdImgDeleted) => [...prevIdImgDeleted, file.image_id]); // Cập nhật idImgDeleted đúng cách
+
+        console.log('data', idImgDeleted);
+
+        setFileList(fileList.filter((item) => item.image_id !== file.image_id));
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             if (open && productID) {
@@ -64,9 +76,14 @@ function ProductEditModal({ open, onClose, productID }) {
                     setProductName(data.productName);
                     setSubCategory(data.subcategory_name);
                     setContent(data.description);
-                    setFileList(
-                        Array.isArray(data.images) ? data.images.map((image) => ({ url: image.image_url })) : [],
-                    );
+                    const updatedFileList = data.images.map((image) => ({
+                        uid: image.image_id,
+                        name: `image-${image.image_id}`,
+                        status: 'done',
+                        url: image.image_url,
+                        image_id: image.image_id,
+                    }));
+                    setFileList(updatedFileList);
                     setVariants(
                         data.variations.map((v) => ({
                             size: v.size,
@@ -89,27 +106,27 @@ function ProductEditModal({ open, onClose, productID }) {
     const handleUpdateProduct = async () => {
         setLoading(true);
         try {
-            const formData = new FormData();
-            formData.append('productName', productName);
-            formData.append('subCategory', subCategory);
-            formData.append('description', content);
+            if (fileList.length > 0) {
+                const formData = new FormData();
+                formData.append('ProductID', productID || '');
 
-            fileList.forEach((file) => {
-                formData.append('images', file.originFileObj);
-            });
-            console.log('Dữ liệu sản phẩm sắp cập nhật:', {
-                productName,
-                subCategory,
-                description: content,
-                images: fileList.map((file) => file.originFileObj),
-                variants,
-            });
+                fileList.forEach((file) => {
+                    console.log('File to upload log:', file.originFileObj);
+                    formData.append('images', file.originFileObj);
+                });
 
-            await updateProductAPI(productID, formData);
-            message.success('Cập nhật sản phẩm thành công!');
-            onClose(); // Đóng modal sau khi cập nhật
+                await addImageAPI(formData);
+                message.success('Cập nhật hình ảnh sản phẩm thành công!');
+            }
+
+            if (idImgDeleted.length > 0) {
+                const deleteData = { ids: idImgDeleted };
+                console.log('Data xóa:', deleteData);
+
+                await removeImageAPI(deleteData);
+                message.success('Xóa hình ảnh sản phẩm thành công!');
+            }
         } catch (error) {
-            console.error('Lỗi khi cập nhật sản phẩm:', error.response ? error.response.data : error.message);
             message.error('Cập nhật sản phẩm không thành công.');
         } finally {
             setLoading(false);
@@ -165,6 +182,7 @@ function ProductEditModal({ open, onClose, productID }) {
                     <Upload
                         listType="picture-card"
                         fileList={fileList}
+                        onRemove={handleRemoveImage}
                         onPreview={handlePreview}
                         onChange={handleChange}
                         maxCount={8}
@@ -192,60 +210,66 @@ function ProductEditModal({ open, onClose, productID }) {
 
             <div className={cx('variant-section')}>
                 <p>Product Variants</p>
-                {variants.map((variant, index) => (
-                    <AntRow gutter={16} key={index} align="middle">
-                        <Col span={7}>
-                            <p>Variant Size</p>
-                            <Input
-                                value={variant.size}
-                                onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                                placeholder="Variant Size"
-                            />
-                        </Col>
-                        <Col span={5}>
-                            <p>Stock</p>
-                            <Input
-                                value={variant.stock}
-                                onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
-                                placeholder="Stock"
-                                type="number"
-                                min={0}
-                            />
-                        </Col>
-                        <Col span={5}>
-                            <p>Price</p>
-                            <Input
-                                value={variant.price}
-                                onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
-                                placeholder="Price"
-                                type="number"
-                                min={0}
-                            />
-                        </Col>
-                        <Col span={5}>
-                            <p>Discount (%)</p>
-                            <Input
-                                value={variant.discount}
-                                onChange={(e) => handleVariantChange(index, 'discount', e.target.value)}
-                                placeholder="Discount"
-                                type="number"
-                                min={0}
-                            />
-                        </Col>
-                        <Col span={2}>
-                            <Button
-                                type="danger"
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleRemoveVariant(index)}
-                                style={{ marginTop: '24px' }}
-                            />
-                        </Col>
-                    </AntRow>
-                ))}
+                {variants.length > 0 ? ( // Kiểm tra nếu có ít nhất một biến thể
+                    variants.map((variant, index) => (
+                        <AntRow gutter={16} key={index} align="middle">
+                            <Col span={7}>
+                                <p>Variant Size</p>
+                                <Input
+                                    value={variant.size}
+                                    onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                                    placeholder="Variant Size"
+                                />
+                            </Col>
+                            <Col span={5}>
+                                <p>Stock</p>
+                                <Input
+                                    value={variant.stock}
+                                    onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
+                                    placeholder="Stock"
+                                    type="number"
+                                    min={0}
+                                />
+                            </Col>
+                            <Col span={5}>
+                                <p>Price</p>
+                                <Input
+                                    value={variant.price}
+                                    onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                                    placeholder="Price"
+                                    type="number"
+                                    min={0}
+                                />
+                            </Col>
+                            <Col span={5}>
+                                <p>Discount (%)</p>
+                                <Input
+                                    value={variant.discount}
+                                    onChange={(e) => handleVariantChange(index, 'discount', e.target.value)}
+                                    placeholder="Discount"
+                                    type="number"
+                                    min={0}
+                                />
+                            </Col>
+                            <Col span={2}>
+                                <Button
+                                    type="danger"
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => handleRemoveVariant(index)}
+                                    style={{ marginTop: '24px' }}
+                                />
+                            </Col>
+                        </AntRow>
+                    ))
+                ) : (
+                    <p>No variants available</p> // Nếu không có biến thể nào, hiển thị thông báo
+                )}
+
                 <Button type="dashed" onClick={handleAddVariant} style={{ width: '100%', marginTop: '16px' }}>
                     Add Variant
                 </Button>
             </div>
+
             {error && <p className={cx('error-message')}>{error}</p>}
         </Modal>
     );

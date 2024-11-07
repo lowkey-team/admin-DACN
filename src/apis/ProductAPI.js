@@ -37,3 +37,23 @@ export const updateProductAPI = async (id, formData) => {
         },
     });
 };
+
+export const addImageAPI = async (formData) => {
+    return await axios.post(`${API_ROOT}/v1/image/images`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const removeImageAPI = async (deleteData) => {
+    try {
+        const response = await axios.delete(`${API_ROOT}/v1/image/images`, {
+            data: deleteData,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Lỗi khi xóa hình ảnh:', error);
+        throw error;
+    }
+};
