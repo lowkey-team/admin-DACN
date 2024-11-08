@@ -12,6 +12,12 @@ export const fetchProductAllAPI = async () => {
     return response.data;
 };
 
+export const fetchProductByIdAPI = async (id) => {
+    const response = await axios.get(`${API_ROOT}/v1/product/${id}`);
+    return response.data;
+};
+
+
 export const fetchCategoryAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/category`);
     return response.data;
