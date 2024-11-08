@@ -6,7 +6,11 @@ import 'slick-carousel/slick/slick-theme.css';
 import { fetchProductByIdAPI } from '~/apis/ProductAPI';
 import classNames from 'classnames/bind';
 
+<<<<<<< HEAD
 import styles from './ProductDetailMoal.module.scss';
+=======
+import styles from './ProductDetailModal.module.scss';
+>>>>>>> 6a980dcc2dac63c659607df223dfaacb30bb4743
 
 const cx = classNames.bind(styles);
 
@@ -21,7 +25,11 @@ function ProductDetailModal({ productID, open, onClose }) {
 
     useEffect(() => {
         if (productDetails && productDetails.images && productDetails.images.length > 0) {
+<<<<<<< HEAD
             setSelectedImage(productDetails.images[0]);
+=======
+            setSelectedImage(productDetails.images[0].image_url);
+>>>>>>> 6a980dcc2dac63c659607df223dfaacb30bb4743
             setSelectedVariant(productDetails.variations[0]); // Chọn biến thể đầu tiên làm mặc định
         }
     }, [productDetails]);
@@ -112,13 +120,18 @@ function ProductDetailModal({ productID, open, onClose }) {
             cancelText="Hủy"
             width={1000}
         >
+<<<<<<< HEAD
             <div className={cx('modal-content')}>
+=======
+            <>
+>>>>>>> 6a980dcc2dac63c659607df223dfaacb30bb4743
                 {loading ? (
                     <p>Đang tải...</p>
                 ) : error ? (
                     <p>{error}</p>
                 ) : productDetails ? (
                     <>
+<<<<<<< HEAD
                         <div className={cx('Product-Image')}>
                             <div className={cx('ImageBig')}>
                                 <img
@@ -209,12 +222,119 @@ function ProductDetailModal({ productID, open, onClose }) {
                             ) : (
                                 <p>Không có biến thể nào.</p>
                             )}
+=======
+                        <div className={cx('modal-content')}>
+                            <div className={cx('Product-Image')}>
+                                <div className={cx('ImageBig')}>
+                                    <img
+                                        src={selectedImage}
+                                        alt={productDetails.productName}
+                                        className={cx('modal-image')}
+                                    />
+                                </div>
+                                <div className={cx('ImageSmalls')}>
+                                    <Slider {...sliderSettings}>
+                                        {productDetails.images.map((image, index) => (
+                                            <div
+                                                key={index}
+                                                className={cx('image-small')}
+                                                onClick={() => handleImageClick(image.image_url)}
+                                            >
+                                                <img
+                                                    src={image.image_url}
+                                                    alt={`${productDetails.productName} ${index}`}
+                                                />
+                                            </div>
+                                        ))}
+                                    </Slider>
+                                </div>
+                            </div>
+
+                            <div className={cx('Product-Detail')}>
+                                <p className={cx('categoryName')}>
+                                    Loại sản phẩm: <span>{productDetails.category_name}</span>
+                                </p>
+                                <p className={cx('productName')}>
+                                    Tên sản phẩm: <span>{productDetails.productName}</span>
+                                </p>
+
+                                {productDetails.variations && productDetails.variations.length > 0 ? (
+                                    <div>
+                                        <p>Chọn kích thước:</p>
+                                        <div className={cx('size-options')}>
+                                            {productDetails.variations.map((variant) => (
+                                                <button
+                                                    key={variant.variation_id}
+                                                    className={cx({ selected: selectedSize === variant.size })}
+                                                    onClick={() => handleSizeClick(variant)}
+                                                >
+                                                    {variant.size}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {selectedVariant && (
+                                            <div className={cx('variant-details')}>
+                                                <p className={cx('quantity-size')}>
+                                                    Số lượng tồn: {selectedVariant.stock}
+                                                </p>
+                                                {selectedVariant.discount > 0 ? (
+                                                    <div className={cx('price')}>
+                                                        <div className={cx('price-sale')}>
+                                                            <p>Thành tiền: {totalPrice.toLocaleString()} VND</p>
+                                                            <h6 className={cx('precent-sale')}>
+                                                                {selectedVariant.discount}%
+                                                            </h6>
+                                                        </div>
+                                                        <p className={cx('price-origin')}>
+                                                            Giá gốc: {selectedVariant.price.toLocaleString()} VND
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <p className={cx('price-no-sale')}>
+                                                        Thành tiền:{' '}
+                                                        {(selectedVariant.price * quantity).toLocaleString()} VND
+                                                    </p>
+                                                )}
+
+                                                <div className={cx('Quantity')}>
+                                                    <p onClick={() => adjustQuantity(-1)} style={{ cursor: 'pointer' }}>
+                                                        -
+                                                    </p>
+                                                    <input
+                                                        type="number"
+                                                        value={quantity}
+                                                        onChange={handleInputChange}
+                                                        onBlur={handleBlur}
+                                                        min="1"
+                                                        style={{ width: '50px', textAlign: 'center' }}
+                                                    />
+                                                    <p onClick={() => adjustQuantity(1)} style={{ cursor: 'pointer' }}>
+                                                        +
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <p>Không có biến thể nào.</p>
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <p>Mô tả</p>
+                            <div dangerouslySetInnerHTML={{ __html: productDetails.description }}></div>
+>>>>>>> 6a980dcc2dac63c659607df223dfaacb30bb4743
                         </div>
                     </>
                 ) : (
                     <p>Không tìm thấy chi tiết sản phẩm.</p>
                 )}
+<<<<<<< HEAD
             </div>
+=======
+            </>
+>>>>>>> 6a980dcc2dac63c659607df223dfaacb30bb4743
         </Modal>
     );
 }

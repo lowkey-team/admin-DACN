@@ -9,10 +9,12 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { formatDateTime } from '~/utils/dateUtils';
 import { Button } from 'antd';
 import ProductDetailModal from '../ProductDetailModal';
+import ProductEditModal from '../ProductEditModal';
 
 export default function ProductRow({ row, initialOpen = false }) {
     const [open, setOpen] = useState(initialOpen);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modelEdit, setModelEdit] = useState(false);
 
     const handleShowModal = () => {
         setModalVisible(true);
@@ -20,6 +22,14 @@ export default function ProductRow({ row, initialOpen = false }) {
 
     const handleHideModal = () => {
         setModalVisible(false);
+    };
+
+    const handleShowModalEdit = () => {
+        setModelEdit(true);
+    };
+
+    const handleHideModalEdit = () => {
+        setModelEdit(false);
     };
     return (
         <>
@@ -47,7 +57,7 @@ export default function ProductRow({ row, initialOpen = false }) {
                         Detail
                     </Button>
 
-                    <Button color="default" variant="dashed">
+                    <Button color="default" variant="dashed" onClick={handleShowModalEdit} productID={row.id}>
                         Edit
                     </Button>
                     <Button color="default" variant="dashed">
@@ -96,8 +106,8 @@ export default function ProductRow({ row, initialOpen = false }) {
                     )}
                 </td>
             </tr>
-
             <ProductDetailModal productID={row.product_id} open={modalVisible} onClose={handleHideModal} />
+            <ProductEditModal productID={row.product_id} open={modelEdit} onClose={handleHideModalEdit} />
         </>
     );
 }

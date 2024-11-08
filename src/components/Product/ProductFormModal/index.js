@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Input, Button, Row as AntRow, Col, Upload, Image } from 'antd';
+import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, message } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import classNames from 'classnames/bind';
@@ -81,6 +81,7 @@ function ProductFormModal({ open, onClose }) {
 
         try {
             const response = await AddProductAPI(formData);
+            message.success('Product added successfully');
             console.log('Product added successfully:', response.data);
             onClose();
         } catch (error) {
