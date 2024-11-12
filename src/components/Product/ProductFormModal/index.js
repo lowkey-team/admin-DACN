@@ -66,7 +66,6 @@ function ProductFormModal({ open, onClose }) {
             formData.append(`variants[${index}][VariantName]`, variant.VariantName || '');
             formData.append(`variants[${index}][Stock]`, variant.Stock || '');
             formData.append(`variants[${index}][Price]`, variant.Price || '');
-            formData.append(`variants[${index}][Discount]`, variant.Discount || '');
         });
 
         fileList.forEach((file) => {
@@ -193,14 +192,6 @@ function ProductFormModal({ open, onClose }) {
                                 placeholder="Price"
                                 type="number"
                                 min={0}
-                            />
-                        </Col>
-                        <Col span={5}>
-                            <p>Discount</p>
-                            <Input
-                                value={variant.Discount}
-                                onChange={(e) => handleVariantChange(index, 'Discount', e.target.value)}
-                                placeholder="Discount"
                             />
                         </Col>
                         <Col span={2}>

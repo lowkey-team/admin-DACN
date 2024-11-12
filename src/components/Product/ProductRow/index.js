@@ -88,7 +88,8 @@ export default function ProductRow({ row, initialOpen = false }) {
                                         <th>Kích cỡ</th>
                                         <th>Giá (VND)</th>
                                         <th>Số lượng trong kho</th>
-                                        <th>Giảm giá (%)</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày cập nhật</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -97,7 +98,12 @@ export default function ProductRow({ row, initialOpen = false }) {
                                             <td>{variation.size || 'N/A'}</td>
                                             <td>{variation.price ? variation.price.toLocaleString() : 'N/A'}</td>
                                             <td>{variation.stock !== null ? variation.stock : 'N/A'}</td>
-                                            <td>{variation.discount !== null ? `${variation.discount}%` : 'N/A'}</td>
+                                            <td>{variation.isDelete === 1 ? 'Còn kinh doanh' : 'Ngừng kinh doanh'}</td>
+                                            <td>
+                                                {variation.updatedAt
+                                                    ? new Date(variation.updatedAt.replace(' ', 'T')).toLocaleString()
+                                                    : 'N/A'}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

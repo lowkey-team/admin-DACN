@@ -57,3 +57,21 @@ export const removeImageAPI = async (deleteData) => {
         throw error;
     }
 };
+
+export const addVariationAPI = async function (formData) {
+    const response = await axios.post(`${API_ROOT}/v1/variation/bulk`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.data;
+};
+
+export const updateVariationAPI = async function (formData) {
+    const response = await axios.put(`${API_ROOT}/v1/variation/bulk`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.data;
+};
