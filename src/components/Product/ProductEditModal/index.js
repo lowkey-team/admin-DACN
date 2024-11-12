@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Input, Button, Row as AntRow, Col, Upload, Image } from 'antd';
+import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, Select, Table } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import classNames from 'classnames/bind';
 import style from './ProductEditMoal.module.scss';
 import SummernoteEditor from '~/components/Summernote';
-import { addImageAPI, fetchProductByIdAPI, removeImageAPI, updateProductAPI } from '~/apis/ProductAPI';
+import {
+    addImageAPI,
+    addVariationAPI,
+    fetchProductByIdAPI,
+    removeImageAPI,
+    updateProductAPI,
+    updateVariationAPI,
+} from '~/apis/ProductAPI';
 
 const cx = classNames.bind(style);
 const getBase64 = (file) =>
@@ -37,19 +44,19 @@ function ProductEditModal({ open, onClose, productID }) {
         setPreviewOpen(true);
     };
 
-    const handleAddVariant = () => {
-        setVariants([...variants, { size: '', stock: '', price: '', discount: '' }]);
-    };
+    // const handleAddVariant = () => {
+    //     setVariants([...variants, { size: '', stock: '', price: '' }]);
+    // };
 
-    const handleRemoveVariant = (index) => {
-        setVariants(variants.filter((_, i) => i !== index));
-    };
+    // const handleRemoveVariant = (index) => {
+    //     setVariants(variants.filter((_, i) => i !== index));
+    // };
 
-    const handleVariantChange = (index, field, value) => {
-        const newVariants = [...variants];
-        newVariants[index][field] = value;
-        setVariants(newVariants);
-    };
+    // const handleVariantChange = (index, field, value) => {
+    //     const newVariants = [...variants];
+    //     newVariants[index][field] = value;
+    //     setVariants(newVariants);
+    // };
 
     const handleChange = ({ fileList: newFileList }) => {
         setFileList(newFileList);
@@ -58,12 +65,93 @@ function ProductEditModal({ open, onClose, productID }) {
     };
 
     const handleRemoveImage = (file) => {
-        setIdImgDeleted((prevIdImgDeleted) => [...prevIdImgDeleted, file.image_id]); // Cập nhật idImgDeleted đúng cách
+        setIdImgDeleted((prevIdImgDeleted) => [...prevIdImgDeleted, file.image_id]);
 
         console.log('data', idImgDeleted);
 
         setFileList(fileList.filter((item) => item.image_id !== file.image_id));
     };
+
+    // const handleStatusChange = (index, value) => {
+    //     const newVariants = [...variants];
+    //     newVariants[index].isDelete = value;
+    //     setVariants(newVariants);
+    // };
+
+    // const columns = [
+    //     {
+    //         title: 'ID',
+    //         dataIndex: 'id',
+    //         key: 'id',
+    //         render: (text) => text || '-',
+    //     },
+    //     {
+    //         title: 'Size',
+    //         dataIndex: 'size',
+    //         key: 'size',
+    //         render: (_, record, index) => (
+    //             <Input
+    //                 value={record.size}
+    //                 onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+    //                 placeholder="Variant Size"
+    //             />
+    //         ),
+    //     },
+    //     {
+    //         title: 'Stock',
+    //         dataIndex: 'stock',
+    //         key: 'stock',
+    //         render: (_, record, index) => (
+    //             <Input
+    //                 value={record.stock}
+    //                 onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
+    //                 placeholder="Stock"
+    //                 type="number"
+    //                 min={0}
+    //             />
+    //         ),
+    //     },
+    //     {
+    //         title: 'Price',
+    //         dataIndex: 'price',
+    //         key: 'price',
+    //         render: (_, record, index) => (
+    //             <Input
+    //                 value={record.price}
+    //                 onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+    //                 placeholder="Price"
+    //                 type="number"
+    //                 min={0}
+    //             />
+    //         ),
+    //     },
+    //     {
+    //         title: 'Status',
+    //         dataIndex: 'isDelete',
+    //         key: 'isDelete',
+    //         render: (_, record, index) =>
+    //             record.id !== undefined ? (
+    //                 <Select
+    //                     value={record.isDelete !== undefined ? record.isDelete : 0} // Hiển thị giá trị hiện tại hoặc giá trị mặc định
+    //                     onChange={(value) => handleVariantChange(index, 'isDelete', value)}
+    //                     style={{ width: '100%' }}
+    //                     loading={!record.isDelete && !record.id} // Hiển thị trạng thái loading khi cần
+    //                 >
+    //                     <Select.Option value={1}>Ngừng kinh doanh</Select.Option>
+    //                     <Select.Option value={0}>Còn kinh doanh</Select.Option>
+    //                 </Select>
+    //             ) : null,
+    //     },
+
+    //     {
+    //         title: 'Action',
+    //         key: 'action',
+    //         render: (_, record, index) =>
+    //             !record.id && (
+    //                 <Button type="danger" icon={<DeleteOutlined />} onClick={() => handleRemoveVariant(index)} />
+    //             ),
+    //     },
+    // ];
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,12 +174,14 @@ function ProductEditModal({ open, onClose, productID }) {
                     setFileList(updatedFileList);
                     setVariants(
                         data.variations.map((v) => ({
+                            id: v.variation_id,
                             size: v.size,
                             price: v.price,
                             stock: v.stock,
-                            discount: v.discount,
                         })),
                     );
+
+                    console.log('variants data', variants);
                 } catch (error) {
                     console.error('Lỗi khi tải dữ liệu sản phẩm:', error);
                     setError('Không thể tải chi tiết sản phẩm.');
@@ -105,6 +195,15 @@ function ProductEditModal({ open, onClose, productID }) {
 
     const handleUpdateProduct = async () => {
         setLoading(true);
+
+        if (
+            !productName ||
+            !subCategory ||
+            variants.some((variant) => !variant.size || !variant.stock || !variant.price)
+        ) {
+            message.error('Vui lòng điền đầy đủ thông tin trước khi cập nhật!');
+            return;
+        }
         try {
             if (fileList.length > 0) {
                 const formData = new FormData();
@@ -126,6 +225,29 @@ function ProductEditModal({ open, onClose, productID }) {
                 await removeImageAPI(deleteData);
                 message.success('Xóa hình ảnh sản phẩm thành công!');
             }
+
+            const newVariants = variants.filter((variant) => !variant.id);
+            const newVariantData = newVariants.map((variant) => ({
+                ID_Product: productID,
+                size: variant.size,
+                Price: parseInt(variant.price),
+                stock: parseInt(variant.stock),
+            }));
+
+            if (newVariantData.length > 0) {
+                console.log('Variants để thêm:', newVariantData);
+                await addVariationAPI(newVariantData);
+                message.success('Thêm biến thể mới thành công!');
+            }
+
+            const updatedVariants = variants.map((variant) => ({
+                ...variant,
+                Price: parseInt(variant.price),
+            }));
+
+            console.log('Variants đã thay đổi:', updatedVariants);
+            await updateVariationAPI(updatedVariants);
+            message.success('Cập nhật biến thể thành công!');
         } catch (error) {
             message.error('Cập nhật sản phẩm không thành công.');
         } finally {
@@ -135,12 +257,12 @@ function ProductEditModal({ open, onClose, productID }) {
 
     return (
         <Modal
-            title="Update Product"
+            title="Cập nhật thông tin sản phẩm"
             open={open}
             onOk={handleUpdateProduct}
             onCancel={onClose}
-            okText="Update Product"
-            cancelText="Cancel"
+            okText="Cập nhật"
+            cancelText="Hủy"
             className={cx('wrapper')}
             width={1100}
             confirmLoading={loading}
@@ -148,22 +270,22 @@ function ProductEditModal({ open, onClose, productID }) {
             <AntRow gutter={16}>
                 <Col span={16}>
                     <AntRow gutter={16}>
-                        <Col span={24}>
-                            <p>Product name</p>
+                        <Col className={cx('form-input')} span={24}>
+                           <label>Tên sản phẩm</label>
                             <Input
-                                placeholder="Product Name"
+                                placeholder="Tên sản phẩm"
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
                             />
                         </Col>
-                        <Col span={12}>
-                            <p>Category</p>
-                            <Input placeholder="Category" />
+                        <Col className={cx('form-input')} span={12}>
+                           <label>Danh mục</label>
+                            <Input placeholder="Danh mục" />
                         </Col>
-                        <Col span={12}>
-                            <p>Sub Category</p>
+                        <Col className={cx('form-input')} span={12}>
+                           <label>Danh mục con</label>
                             <Input
-                                placeholder="Sub Category"
+                                placeholder="Danh mục con"
                                 value={subCategory}
                                 onChange={(e) => setSubCategory(e.target.value)}
                             />
@@ -186,11 +308,12 @@ function ProductEditModal({ open, onClose, productID }) {
                         onPreview={handlePreview}
                         onChange={handleChange}
                         maxCount={8}
+                        multiple
                     >
                         {fileList.length >= 8 ? null : (
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <PlusOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
-                                <div style={{ marginTop: 8, color: '#1890ff' }}>Upload</div>
+                            <div className={cx('fileList-upload')}>
+                                <PlusOutlined className={cx('plusoutline')} />
+                                <div className={cx('upload')}>Tải ảnh lên</div>
                             </div>
                         )}
                     </Upload>
@@ -208,67 +331,6 @@ function ProductEditModal({ open, onClose, productID }) {
                 </Col>
             </AntRow>
 
-            <div className={cx('variant-section')}>
-                <p>Product Variants</p>
-                {variants.length > 0 ? ( // Kiểm tra nếu có ít nhất một biến thể
-                    variants.map((variant, index) => (
-                        <AntRow gutter={16} key={index} align="middle">
-                            <Col span={7}>
-                                <p>Variant Size</p>
-                                <Input
-                                    value={variant.size}
-                                    onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                                    placeholder="Variant Size"
-                                />
-                            </Col>
-                            <Col span={5}>
-                                <p>Stock</p>
-                                <Input
-                                    value={variant.stock}
-                                    onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
-                                    placeholder="Stock"
-                                    type="number"
-                                    min={0}
-                                />
-                            </Col>
-                            <Col span={5}>
-                                <p>Price</p>
-                                <Input
-                                    value={variant.price}
-                                    onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
-                                    placeholder="Price"
-                                    type="number"
-                                    min={0}
-                                />
-                            </Col>
-                            <Col span={5}>
-                                <p>Discount (%)</p>
-                                <Input
-                                    value={variant.discount}
-                                    onChange={(e) => handleVariantChange(index, 'discount', e.target.value)}
-                                    placeholder="Discount"
-                                    type="number"
-                                    min={0}
-                                />
-                            </Col>
-                            <Col span={2}>
-                                <Button
-                                    type="danger"
-                                    icon={<DeleteOutlined />}
-                                    onClick={() => handleRemoveVariant(index)}
-                                    style={{ marginTop: '24px' }}
-                                />
-                            </Col>
-                        </AntRow>
-                    ))
-                ) : (
-                    <p>No variants available</p> // Nếu không có biến thể nào, hiển thị thông báo
-                )}
-
-                <Button type="dashed" onClick={handleAddVariant} style={{ width: '100%', marginTop: '16px' }}>
-                    Add Variant
-                </Button>
-            </div>
 
             {error && <p className={cx('error-message')}>{error}</p>}
         </Modal>

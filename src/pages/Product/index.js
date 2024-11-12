@@ -1,56 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Typography, Input, Row, Col, Select } from 'antd';
-import { fecthPorductAPI } from '../../apis/ProductAPI';
+import { Pagination, Button, Row as AntRow, Col } from 'antd';
 import classNames from 'classnames/bind';
+import { fetchProductAllAPI, fetchCategoryAPI } from '~/apis/ProductAPI';
+import ProductFilters from '~/components/Product/ProductFilters';
+import ProductTable from '~/components/Product/ProductTable';
 import style from './Product.module.scss';
-import Button from '~/components/Button';
-import { formatDateTime } from '~/utils/dateUtils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { exportToExcel } from '~/utils/excelUtils';
+import ProductFormModal from '~/components/Product/ProductFormModal';
 
 const cx = classNames.bind(style);
-const { Title } = Typography;
-const { Option } = Select;
 
-function Product() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export default function TableCollapsibleRow() {
+    const [rows, setRows] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState({});
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortOrder, setSortOrder] = useState({ name: 'asc', date: 'asc' }); // State cho sắp xếp
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const categories = ['Category 1', 'Category 2', 'Category 3'];
-    const subcategories = {
-        'Category 1': ['Subcategory 1-1', 'Subcategory 1-2'],
-        'Category 2': ['Subcategory 2-1', 'Subcategory 2-2'],
-        'Category 3': ['Subcategory 3-1', 'Subcategory 3-2'],
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const hideModal = () => {
+        setIsModalOpen(false);
     };
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const data = await fecthPorductAPI();
-                setProducts(data);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
+            const data = await fetchProductAllAPI();
+            setRows(data);
         };
-
         fetchData();
     }, []);
 
-    const handleRemoveCategory = (categoryToRemove) => {
-        setSelectedCategories((prevCategories) => prevCategories.filter((category) => category !== categoryToRemove));
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            const apiData = await fetchCategoryAPI();
+            const categoryNames = apiData.map((category) => category.category_name);
+            setCategories(categoryNames);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+            const subcategoriesData = {};
+            apiData.forEach((category) => {
+                subcategoriesData[category.category_name] = category.subcategories.map((sub) => sub.SupCategoryName);
+            });
+            setSubcategories(subcategoriesData);
+        };
+        fetchData();
+    }, []);
 
-    // Lọc sản phẩm theo danh mục và subcategory đã chọn
-    const filteredProducts = products.filter((product) => {
+    const filteredProducts = rows.filter((product) => {
         const matchesCategory =
             selectedCategories.length > 0 ? selectedCategories.includes(product.category_name) : true;
         const matchesSubcategory =
@@ -60,126 +64,66 @@ function Product() {
         return matchesCategory && matchesSubcategory && matchesSearchTerm;
     });
 
-    // Sắp xếp sản phẩm theo thứ tự
-    const sortedProducts = filteredProducts.sort((a, b) => {
-        // Sắp xếp theo tên
-        if (a.productName < b.productName) return sortOrder.name === 'asc' ? -1 : 1;
-        if (a.productName > b.productName) return sortOrder.name === 'asc' ? 1 : -1;
-
-        // Nếu tên bằng nhau, sắp xếp theo ngày
-        return sortOrder.date === 'asc'
-            ? new Date(a.createdAt) - new Date(b.createdAt)
-            : new Date(b.createdAt) - new Date(a.createdAt);
-    });
+    const totalRows = filteredProducts.length;
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const currentRows = filteredProducts.slice(startIndex, startIndex + rowsPerPage);
 
     return (
         <>
-            <Title level={1}>Product List</Title>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Input
-                        placeholder="Search products"
-                        prefix={<SearchOutlined />}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+            <AntRow>
+                <Col span={15}>
+                    <p className={cx('Title')}>Danh sách sản phẩm</p>
                 </Col>
-                <Col>
-                    <Select
-                        style={{ minWidth: 100 }}
-                        mode="multiple"
-                        placeholder="Categories"
-                        value={selectedCategories}
-                        onChange={(value) => setSelectedCategories(value)}
-                        allowClear
+                <Col span={3} className={cx('btn-create')}>
+                    <Button
+                        className={cx('btn-ExportToExcel')}
+                        icon={<FontAwesomeIcon icon={faFileExcel} />}
+                        onClick={() => exportToExcel(currentRows)}
                     >
-                        {categories.map((category) => (
-                            <Option key={category} value={category}>
-                                {category}
-                            </Option>
-                        ))}
-                    </Select>
+                        Nhập từ excel
+                    </Button>
                 </Col>
-                <Col>
-                    <Select
-                        style={{ minWidth: 100 }}
-                        mode="multiple"
-                        placeholder="subcategories"
-                        value={selectedSubcategories}
-                        onChange={(value) => setSelectedSubcategories(value)}
-                        allowClear
+                <Col span={3} className={cx('btn-create')}>
+                    <Button
+                        className={cx('btn-ExportToExcel')}
+                        icon={<FontAwesomeIcon icon={faFileExcel} />}
+                        onClick={() => exportToExcel(currentRows)}
                     >
-                        {Object.entries(subcategories).map(([category, subs]) =>
-                            selectedCategories.includes(category)
-                                ? subs.map((subcategory) => (
-                                      <Option key={subcategory} value={subcategory}>
-                                          {subcategory}
-                                      </Option>
-                                  ))
-                                : null,
-                        )}
-                    </Select>
+                        Xuất ra excel
+                    </Button>
                 </Col>
-                <Col>
-                    <Select
-                        style={{ minWidth: 100 }}
-                        placeholder="Sort by name"
-                        value={sortOrder.name}
-                        onChange={(value) => setSortOrder((prev) => ({ ...prev, name: value }))}
-                        allowClear
-                    >
-                        <Option value="asc">Tên A-Z</Option>
-                        <Option value="desc">Tên Z-A</Option>
-                    </Select>
+                <Col span={3} className={cx('btn-create')}>
+                    <Button 
+                        type="primary" 
+                        icon={<FontAwesomeIcon icon={faPlus} />} 
+                        onClick={showModal}
+                        style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
+                        >
+                        Thêm sản phẩm
+                    </Button>
                 </Col>
-                <Col>
-                    <Select
-                        style={{ minWidth: 100 }}
-                        placeholder="Sort by date"
-                        value={sortOrder.date}
-                        onChange={(value) => setSortOrder((prev) => ({ ...prev, date: value }))}
-                        allowClear
-                    >
-                        <Option value="asc">asc</Option>
-                        <Option value="desc">desc</Option>
-                    </Select>
-                </Col>
-            </Row>
-            <div className="container mt-3">
-                <table className={classNames(cx('box-table'), 'table')}>
-                    <thead className="table-primary">
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th>Product Name</th>
-                            <th>Subcategory</th>
-                            <th>Category</th>
-                            <th>Create Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedProducts.map((product) => (
-                            <tr key={product.product_id}>
-                                <td>O</td>
-                                <td className={cx('box-img_productItem')}>
-                                    <img className={cx('img-product')} src={product.images} alt={product.productName} />
-                                </td>
-                                <td>{product.productName}</td>
-                                <td>{product.subcategory_name}</td>
-                                <td>{product.category_name}</td>
-                                <td>{formatDateTime(product.createdAt)}</td>
-                                <td>
-                                    <Button edit onClick={() => alert('Edit product')}>
-                                        <EyeOutlined /> detail
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            </AntRow>
+            <ProductFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                categories={categories}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+                subcategories={subcategories}
+                selectedSubcategories={selectedSubcategories}
+                setSelectedSubcategories={setSelectedSubcategories}
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+            />
+            <ProductTable currentRows={currentRows} />
+            <Pagination
+                current={currentPage}
+                total={totalRows}
+                pageSize={rowsPerPage}
+                onChange={(page) => setCurrentPage(page)}
+                style={{ marginTop: '16px', textAlign: 'right' }}
+            />
+            <ProductFormModal open={isModalOpen} onClose={hideModal} />
         </>
     );
 }
-
-export default Product;

@@ -21,7 +21,7 @@ export default function ProductFilters({
         <AntRow gutter={[16, 16]} style={{ marginBottom: '16px' }}>
             <Col span={8}>
                 <Input
-                    placeholder="Search by product name"
+                    placeholder="Tìm kiếm sản phẩm theo tên"
                     prefix={<SearchOutlined />}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -32,7 +32,7 @@ export default function ProductFilters({
                         <Select
                             style={{ minWidth: 150 }}
                             mode="multiple"
-                            placeholder="Category Name"
+                            placeholder="Tên danh mục"
                             value={selectedCategories}
                             onChange={setSelectedCategories}
                             allowClear
@@ -57,7 +57,7 @@ export default function ProductFilters({
                         <Select
                             style={{ minWidth: 150 }}
                             mode="multiple"
-                            placeholder="Sup category"
+                            placeholder="Danh mục con"
                             value={selectedSubcategories}
                             onChange={setSelectedSubcategories}
                             allowClear

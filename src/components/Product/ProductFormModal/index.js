@@ -66,7 +66,6 @@ function ProductFormModal({ open, onClose }) {
             formData.append(`variants[${index}][VariantName]`, variant.VariantName || '');
             formData.append(`variants[${index}][Stock]`, variant.Stock || '');
             formData.append(`variants[${index}][Price]`, variant.Price || '');
-            formData.append(`variants[${index}][Discount]`, variant.Discount || '');
         });
 
         fileList.forEach((file) => {
@@ -91,40 +90,40 @@ function ProductFormModal({ open, onClose }) {
 
     return (
         <Modal
-            title="Create Product"
+            title="Thêm sản phẩm mới"
             open={open}
             onOk={handleAddProduct}
             onCancel={onClose}
-            okText="+ Add Product"
-            cancelText="Cancel"
+            okText="Thêm sản phẩm"
+            cancelText="Hủy"
             className={cx('wrapper')}
             width={1100}
         >
             <AntRow gutter={16}>
                 <Col span={16}>
                     <AntRow gutter={16}>
-                        <Col span={24}>
-                            <p>Product name</p>
+                        <Col className={cx('form-input')} span={24}>
+                            <label>Tên sản phẩm</label>
                             <Input
-                                placeholder="Product Name"
+                                placeholder="Tên sản phẩm"
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
                             />
                         </Col>
-                        <Col span={12}>
-                            <p>Category</p>
-                            <Input placeholder="Category" />
+                        <Col className={cx('form-input')} span={12}>
+                            <label>Danh mục</label>
+                            <Input placeholder="Danh mục" />
                         </Col>
-                        <Col span={12}>
-                            <p>Sub Category</p>
+                        <Col className={cx('form-input')} span={12}>
+                            <label>Danh mục con</label>
                             <Input
-                                placeholder="Sub Category"
+                                placeholder="Danh mục con"
                                 value={subCategory}
                                 onChange={(e) => setSubCategory(e.target.value)}
                                 type="number"
                             />
                         </Col>
-                        <Col span={24} className={cx('box-content')}>
+                        <Col className={cx('form-input', 'box-content')} span={24}>
                             <SummernoteEditor
                                 className={cx('txt-description')}
                                 content={content}
@@ -134,7 +133,7 @@ function ProductFormModal({ open, onClose }) {
                     </AntRow>
                 </Col>
 
-                <Col span={8}>
+                <Col className={cx('form-input')} span={8}>
                     <Upload
                         listType="picture-card"
                         fileList={fileList}
@@ -143,9 +142,9 @@ function ProductFormModal({ open, onClose }) {
                         maxCount={8}
                     >
                         {fileList.length >= 8 ? null : (
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <PlusOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
-                                <div style={{ marginTop: 8, color: '#1890ff' }}>Upload</div>
+                            <div className={cx('fileList-upload')}>
+                                <PlusOutlined className={cx('plusoutline')} />
+                                <div className={cx('upload-img')}>Tải ảnh lên</div>
                             </div>
                         )}
                     </Upload>
@@ -164,57 +163,49 @@ function ProductFormModal({ open, onClose }) {
             </AntRow>
 
             <div className={cx('variant-section')}>
-                <p>Product Variants</p>
+                <p>Biến thể sản phẩm</p>
                 {variants.map((variant, index) => (
                     <AntRow gutter={16} key={index} align="middle">
-                        <Col span={7}>
-                            <p>Variant name</p>
+                        <Col className={cx('form-input')} span={7}>
+                            <label>Tên biến thể</label>
                             <Input
                                 value={variant.VariantName}
                                 onChange={(e) => handleVariantChange(index, 'VariantName', e.target.value)}
-                                placeholder="Variant name"
+                                placeholder="Tên biến thể"
                             />
                         </Col>
-                        <Col span={5}>
-                            <p>Stock</p>
+                        <Col className={cx('form-input')} span={5}>
+                            <label>Số lượng</label>
                             <Input
                                 value={variant.Stock}
                                 onChange={(e) => handleVariantChange(index, 'Stock', e.target.value)}
-                                placeholder="Stock"
+                                placeholder="Số lượng"
                                 type="number"
                                 min={0}
                             />
                         </Col>
-                        <Col span={5}>
-                            <p>Price</p>
+                        <Col className={cx('form-input')} span={5}>
+                            <label>Giá</label>
                             <Input
                                 value={variant.Price}
                                 onChange={(e) => handleVariantChange(index, 'Price', e.target.value)}
-                                placeholder="Price"
+                                placeholder="Giá"
                                 type="number"
                                 min={0}
                             />
                         </Col>
-                        <Col span={5}>
-                            <p>Discount</p>
-                            <Input
-                                value={variant.Discount}
-                                onChange={(e) => handleVariantChange(index, 'Discount', e.target.value)}
-                                placeholder="Discount"
-                            />
-                        </Col>
-                        <Col span={2}>
+                        <Col className={cx('form-input')} span={2}>
                             <Button
                                 type="dashed"
-                                style={{ marginTop: '30px', color: 'red' }}
+                                className={cx('btn-deleteVariant')}
                                 onClick={() => handleRemoveVariant(index)}
                                 icon={<DeleteOutlined />}
                             />
                         </Col>
                     </AntRow>
                 ))}
-                <Button type="dashed" onClick={handleAddVariant} style={{ width: '100%', marginTop: '10px' }}>
-                    <PlusOutlined /> Add Variant
+                <Button type="dashed" onClick={handleAddVariant} className={cx('btn-addVariant')}>
+                    <PlusOutlined /> Thêm biến thể
                 </Button>
             </div>
         </Modal>

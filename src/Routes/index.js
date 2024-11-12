@@ -1,6 +1,6 @@
 // HeaderOnly Layout
 import Product from '~/pages/Product';
-import Profile from '~/pages/Profile';
+import Profile from '~/pages/Product';
 //Public Routes
 const publicRoutes = [
     { path: '/', component: Product },

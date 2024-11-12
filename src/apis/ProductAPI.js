@@ -18,12 +18,6 @@ export const fetchProductAllAPI = async () => {
     return response.data;
 };
 
-export const fetchProductByIdAPI = async (id) => {
-    const response = await axios.get(`${API_ROOT}/v1/product/${id}`);
-    return response.data;
-};
-
-
 export const fetchCategoryAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/category`);
     return response.data;
@@ -62,4 +56,22 @@ export const removeImageAPI = async (deleteData) => {
         console.error('Lỗi khi xóa hình ảnh:', error);
         throw error;
     }
+};
+
+export const addVariationAPI = async function (formData) {
+    const response = await axios.post(`${API_ROOT}/v1/variation/bulk`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.data;
+};
+
+export const updateVariationAPI = async function (formData) {
+    const response = await axios.put(`${API_ROOT}/v1/variation/bulk`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.data;
 };
