@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { exportToExcel } from '~/utils/excelUtils';
 import ProductFormModal from '~/components/Product/ProductFormModal';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(style);
 
@@ -22,6 +23,7 @@ export default function TableCollapsibleRow() {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -68,40 +70,54 @@ export default function TableCollapsibleRow() {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const currentRows = filteredProducts.slice(startIndex, startIndex + rowsPerPage);
 
+    const handleAddMore = () => {
+        navigate('/addmoreproduct'); // Chuyển đến đường dẫn bạn muốn
+    };
+
     return (
         <>
             <AntRow>
-                <Col span={15}>
+                <Col span={10}>
                     <p className={cx('Title')}>Danh sách sản phẩm</p>
                 </Col>
-                <Col span={3} className={cx('btn-create')}>
-                    <Button
-                        className={cx('btn-ExportToExcel')}
-                        icon={<FontAwesomeIcon icon={faFileExcel} />}
-                        onClick={() => exportToExcel(currentRows)}
-                    >
-                        Nhập từ excel
-                    </Button>
-                </Col>
-                <Col span={3} className={cx('btn-create')}>
-                    <Button
-                        className={cx('btn-ExportToExcel')}
-                        icon={<FontAwesomeIcon icon={faFileExcel} />}
-                        onClick={() => exportToExcel(currentRows)}
-                    >
-                        Xuất ra excel
-                    </Button>
-                </Col>
-                <Col span={3} className={cx('btn-create')}>
-                    <Button 
-                        type="primary" 
-                        icon={<FontAwesomeIcon icon={faPlus} />} 
-                        onClick={showModal}
-                        style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
+                <div className={cx('action-btn')}>
+                    <Col span={3} className={cx('btn-create')}>
+                        <Button
+                            className={cx('btn-ExportToExcel')}
+                            icon={<FontAwesomeIcon icon={faFileExcel} />}
+                            onClick={() => exportToExcel(currentRows)}
                         >
-                        Thêm sản phẩm
-                    </Button>
-                </Col>
+                            Nhập từ excel
+                        </Button>
+                    </Col>
+                    <Col span={3} className={cx('btn-create')}>
+                        <Button
+                            className={cx('btn-ExportToExcel')}
+                            icon={<FontAwesomeIcon icon={faFileExcel} />}
+                            onClick={() => exportToExcel(currentRows)}
+                        >
+                            Xuất ra excel
+                        </Button>
+                    </Col>
+                    <Col span={4} className={cx('btn-create')}>
+                        <Button 
+                            icon={<FontAwesomeIcon icon={faPlus} />} 
+                            onClick={showModal}
+                            style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
+                            >
+                            Thêm 1 sản phẩm
+                        </Button>
+                    </Col>
+                    <Col span={4} className={cx('btn-create')}>
+                        <Button 
+                            icon={<FontAwesomeIcon icon={faPlus} />} 
+                            onClick={handleAddMore}
+                            style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
+                            >
+                            Thêm nhiều sản phẩm
+                        </Button>
+                    </Col>
+                </div>
             </AntRow>
             <ProductFilters
                 searchTerm={searchTerm}

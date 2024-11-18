@@ -1,0 +1,84 @@
+.table-add {
+
+    table {
+        width: 100%;
+
+        thead {
+            tr {
+                border: 1px solid #333;
+
+                th {
+                    text-align: center;
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+}
+
+.row-add {
+    border: 1px solid black;
+}
+
+.col-input {
+    width: 100%;
+}
+
+.btn_deleteRow {
+    height: 100%;
+
+    button {
+        border: none;
+        background: #ffb6b6;
+        margin-top: 200px;
+        color: #ff0000;
+    }
+}
+
+.btn__add-row {
+    text-align: center;
+
+    button {
+        border: none;
+        border-radius: 999px;
+        background-color: #00ccff;
+        padding: 5px 10px;
+        color: #fff;
+        font-weight: 600;
+        transition: all .1s linear;
+
+        &:hover {
+            box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+        }
+    }
+}
+
+.box-des {
+    margin-top: 5px;
+}
+
+.variant-section {
+    margin-top: 5px;
+}
+
+.btn__deleteRow-variant {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.row-variant {
+    display: flex;
+    align-items: center;
+}
+
+.btn-deleteVariant {
+    margin-top: 20px;
+    color: red;
+}
+
+.btn-addVariant {
+    margin-top: 10px;
+    text-align: center;
+}
