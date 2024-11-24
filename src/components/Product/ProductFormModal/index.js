@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, message, Cascader } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import classNames from 'classnames/bind';
 import style from './ProductFromMoal.module.scss';
-import SummernoteEditor from '~/components/Summernote';
-import { AddProductAPI } from '~/apis/ProductAPI';
+import { AddProductAPI, fetchCategoryAPI } from '~/apis/ProductAPI';
+import CKEditorWrapper from '~/components/Summernote';
 
 const cx = classNames.bind(style);
 
@@ -25,7 +25,23 @@ function ProductFormModal({ open, onClose }) {
     const [variants, setVariants] = useState([{ VariantName: '', Stock: '', Price: '', Discount: '' }]);
     const [productName, setProductName] = useState('');
     const [subCategory, setSubCategory] = useState('');
+    const [categories, setCategories] = useState([]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            const apiData = await fetchCategoryAPI();
+            const categoryOptions = apiData.map((category) => ({
+                value: category.category_name,
+                label: category.category_name,
+                children: category.subcategories.map((sub) => ({
+                    value: sub.id,
+                    label: sub.SupCategoryName,
+                })),
+            }));
+            setCategories(categoryOptions);
+        };
+        fetchData();
+    }, []);
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -51,6 +67,25 @@ function ProductFormModal({ open, onClose }) {
     };
 
     const handleAddProduct = async () => {
+        if (!productName.trim()) {
+            message.error('Tên sản phẩm không được để trống');
+            return;
+        }
+
+        if (!subCategory) {
+            message.error('Vui lòng chọn danh mục và danh mục con');
+            return;
+        }
+
+        const isVariantValid = variants.every(
+            (variant) => variant.VariantName.trim() && variant.Stock && variant.Price,
+        );
+
+        if (!isVariantValid) {
+            message.error('Vui lòng nhập đầy đủ thông tin cho tất cả các biến thể');
+            return;
+        }
+
         const formData = new FormData();
 
         console.log('productName:', productName);
@@ -73,7 +108,6 @@ function ProductFormModal({ open, onClose }) {
             formData.append('images', file.originFileObj);
         });
 
-        // Ghi lại dữ liệu trong formData
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }
@@ -110,21 +144,22 @@ function ProductFormModal({ open, onClose }) {
                                 onChange={(e) => setProductName(e.target.value)}
                             />
                         </Col>
-                        <Col className={cx('form-input')} span={12}>
+                        <Col className={cx('form-input')} span={24}>
                             <label>Danh mục</label>
-                            <Input placeholder="Danh mục" />
-                        </Col>
-                        <Col className={cx('form-input')} span={12}>
-                            <label>Danh mục con</label>
-                            <Input
-                                placeholder="Danh mục con"
-                                value={subCategory}
-                                onChange={(e) => setSubCategory(e.target.value)}
-                                type="number"
+                            <br />
+                            <Cascader
+                                className={cx('cascader-custom')}
+                                options={categories}
+                                placeholder="Chọn danh mục"
+                                onChange={(value) => {
+                                    setSubCategory(value[1] || '');
+                                }}
                             />
                         </Col>
                         <Col className={cx('form-input', 'box-content')} span={24}>
-                            <SummernoteEditor
+                            <label>Mô tả sản phẩm</label>
+                            <br />
+                            <CKEditorWrapper
                                 className={cx('txt-description')}
                                 content={content}
                                 setContent={setContent}

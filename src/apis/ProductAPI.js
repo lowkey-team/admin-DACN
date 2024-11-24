@@ -31,11 +31,8 @@ export const AddProductAPI = async (formData) => {
     });
 };
 export const updateProductAPI = async (id, formData) => {
-    return await axios.put(`${API_ROOT}/v1/product/${id}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    console.log('router', id, formData);
+    return await axios.put(`${API_ROOT}/v1/product/${id}`, formData);
 };
 
 export const addImageAPI = async (formData) => {
@@ -74,4 +71,9 @@ export const updateVariationAPI = async function (formData) {
         },
     });
     return response.data;
+};
+
+export const importProductAPI = async (formData) => {
+    const response = await axios.post(`${API_ROOT}/v1/product/products`, formData);
+    return response;
 };

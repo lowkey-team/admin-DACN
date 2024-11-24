@@ -10,6 +10,8 @@ import { faPlus, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { exportToExcel } from '~/utils/excelUtils';
 import ProductFormModal from '~/components/Product/ProductFormModal';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import ExcelImportModal from '~/components/Product/ExcelImportModal';
 
 const cx = classNames.bind(style);
 
@@ -23,7 +25,22 @@ export default function TableCollapsibleRow() {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [excel, setExcel] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
     const navigate = useNavigate();
+
+    const handleFileImport = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleModalOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleModalCancel = () => {
+        setIsModalVisible(false);
+    };
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -71,7 +88,7 @@ export default function TableCollapsibleRow() {
     const currentRows = filteredProducts.slice(startIndex, startIndex + rowsPerPage);
 
     const handleAddMore = () => {
-        navigate('/addmoreproduct'); // Chuyển đến đường dẫn bạn muốn
+        navigate('/addmoreproduct');
     };
 
     return (
@@ -81,15 +98,17 @@ export default function TableCollapsibleRow() {
                     <p className={cx('Title')}>Danh sách sản phẩm</p>
                 </Col>
                 <div className={cx('action-btn')}>
-                    <Col span={3} className={cx('btn-create')}>
-                        <Button
-                            className={cx('btn-ExportToExcel')}
-                            icon={<FontAwesomeIcon icon={faFileExcel} />}
-                            onClick={() => exportToExcel(currentRows)}
-                        >
-                            Nhập từ excel
+                    <Col span={3}>
+                        <Button icon={<FontAwesomeIcon icon={faFileExcel} />} onClick={handleFileImport}>
+                            Nhập từ Excel
                         </Button>
                     </Col>
+
+                    <ExcelImportModal
+                        isModalVisible={isModalVisible}
+                        handleOk={handleModalOk}
+                        handleCancel={handleModalCancel}
+                    />
                     <Col span={3} className={cx('btn-create')}>
                         <Button
                             className={cx('btn-ExportToExcel')}
@@ -100,20 +119,20 @@ export default function TableCollapsibleRow() {
                         </Button>
                     </Col>
                     <Col span={4} className={cx('btn-create')}>
-                        <Button 
-                            icon={<FontAwesomeIcon icon={faPlus} />} 
+                        <Button
+                            icon={<FontAwesomeIcon icon={faPlus} />}
                             onClick={showModal}
                             style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
-                            >
+                        >
                             Thêm 1 sản phẩm
                         </Button>
                     </Col>
                     <Col span={4} className={cx('btn-create')}>
-                        <Button 
-                            icon={<FontAwesomeIcon icon={faPlus} />} 
+                        <Button
+                            icon={<FontAwesomeIcon icon={faPlus} />}
                             onClick={handleAddMore}
                             style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
-                            >
+                        >
                             Thêm nhiều sản phẩm
                         </Button>
                     </Col>
