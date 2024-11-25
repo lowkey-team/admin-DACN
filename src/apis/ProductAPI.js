@@ -77,3 +77,8 @@ export const importProductAPI = async (formData) => {
     const response = await axios.post(`${API_ROOT}/v1/product/products`, formData);
     return response;
 };
+
+export const fetchInvoiceAllAPI = async () => {
+    const response = await axios.get(`${API_ROOT}/v1/invoices/invoicesAll`);
+    return response;
+};
