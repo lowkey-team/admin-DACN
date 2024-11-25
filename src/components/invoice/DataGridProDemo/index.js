@@ -85,6 +85,10 @@ export default function InvoiceTable() {
             orderStatus: invoice.orderStatus || 'N/A',
             shippingAddress: invoice.shippingAddress || 'N/A',
             paymentMethod: invoice.paymentMethod || 'N/A',
+            customerName: invoice.customerName || 'N/A',
+            customerPhone: invoice.customerPhone || 'N/A',
+            customerEmail: invoice.customerEmail || 'N/A',
+
             createdAt: new Date(invoice.createdAt).toLocaleString(),
         }));
 
