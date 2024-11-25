@@ -18,7 +18,9 @@
 .form-input {
     margin-top: 10px;
 }
-
+.cascader-custom {
+    width: 100%;
+}
 .fileList-upload {
     display: flex;
     flex-direction: column;
@@ -35,7 +37,7 @@
     color: #1890ff;
 }
 
-.btn-deleteVariant{ 
+.btn-deleteVariant {
     margin-top: 23px;
     color: red;
 }

@@ -1,58 +1,59 @@
 import React, { useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
-import $ from 'jquery';
-import 'summernote/dist/summernote.min.js';
-import 'summernote/dist/summernote.css';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import styles from './Summernote.module.scss';
 
-window.jQuery = $;
 const cx = classNames.bind(styles);
 
-const SummernoteEditor = ({ content, setContent }) => {
-    const editorRef = useRef(null);
+const CKEditorWrapper = ({ content, setContent }) => {
+    const editorRef = useRef();
 
     useEffect(() => {
-        $(editorRef.current).summernote({
-            height: 'auto',
-            minHeight: 100,
-            maxHeight: 500,
-            toolbar: [
-                ['style', ['style', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
-                ['font', ['fontname', 'fontsize', 'fontsizeunit']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph', 'height', 'align']],
-                ['table', ['table']], // Chức năng bảng
-                ['insert', ['link', 'picture', 'video', 'hr']],
-                ['view', ['fullscreen', 'codeview', 'help']],
-                ['history', ['undo', 'redo']],
-            ],
-            fontNames: ['Arial', 'Times New Roman', 'Courier New', 'Comic Sans MS', 'Helvetica', 'Roboto'],
-            callbacks: {
-                onChange: (contents) => {
-                    // Ghi nhớ nội dung trong Summernote nhưng không cập nhật ngay
-                },
-                onBlur: (event) => {
-                    // Cập nhật nội dung khi mất focus
-                    setTimeout(() => {
-                        const contents = $(editorRef.current).summernote('code');
-                        setContent(contents);
-                    }, 0);
-                },
-            },
-            code: content,
+        const observer = new ResizeObserver(() => {
+            const editorElement = editorRef.current.querySelector('.ck-editor__editable');
+            if (editorElement) {
+                editorElement.style.height = 'auto';
+                editorElement.style.overflowY = 'hidden';
+            }
         });
 
-        // Giữ focus khi khởi tạo
-        setTimeout(() => {
-            $(editorRef.current).summernote('focus');
-        }, 0);
+        observer.observe(editorRef.current);
 
-        return () => {
-            $(editorRef.current).summernote('destroy');
-        };
-    }, [content, setContent]);
+        return () => observer.disconnect();
+    }, []);
 
-    return <div className={cx('wrapper')} ref={editorRef}></div>;
+    return (
+        <div ref={editorRef}>
+            <CKEditor
+                editor={ClassicEditor}
+                data={content}
+                config={{
+                    toolbar: [
+                        'heading',
+                        '|',
+                        'bold',
+                        'italic',
+                        'link',
+                        '|',
+                        'bulletedList',
+                        'numberedList',
+                        '|',
+                        'blockQuote',
+                        '|',
+                        'insertTable',
+                        '|',
+                        'undo',
+                        'redo',
+                    ],
+                }}
+                onChange={(event, editor) => {
+                    const data = editor.getData();
+                    setContent(data);
+                }}
+            />
+        </div>
+    );
 };
 
-export default SummernoteEditor;
+export default CKEditorWrapper;

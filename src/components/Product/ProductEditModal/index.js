@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, Select, Table } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { message } from 'antd';
+import { Modal, Input, Button, Row as AntRow, Col, Upload, Image, Cascader, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import classNames from 'classnames/bind';
 import style from './ProductEditMoal.module.scss';
 import SummernoteEditor from '~/components/Summernote';
 import {
     addImageAPI,
-    addVariationAPI,
+    fetchCategoryAPI,
     fetchProductByIdAPI,
     removeImageAPI,
     updateProductAPI,
-    updateVariationAPI,
 } from '~/apis/ProductAPI';
 
 const cx = classNames.bind(style);
@@ -28,13 +26,64 @@ function ProductEditModal({ open, onClose, productID }) {
     const [fileList, setFileList] = useState([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    const [variants, setVariants] = useState([]);
     const [productName, setProductName] = useState('');
-    const [subCategory, setSubCategory] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [subCategoryID, setSubCategoryID] = useState('');
+    const [subCategoryName, setSubCategoryName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [newFiles, setNewFiles] = useState([]);
     const [idImgDeleted, setIdImgDeleted] = useState([]);
+
+    useEffect(() => {
+        const fetchProductDetails = async () => {
+            if (open && productID) {
+                setLoading(true);
+                setError(null);
+                try {
+                    const data = await fetchProductByIdAPI(productID);
+                    setProductName(data.productName);
+                    setSubCategoryID(data.subcategory_id);
+                    setSubCategoryName(data.subcategory_name);
+                    setContent(data.description);
+                    setFileList(
+                        data.images.map((image) => ({
+                            uid: image.image_id,
+                            name: `image-${image.image_id}`,
+                            status: 'done',
+                            url: image.image_url,
+                            image_id: image.image_id,
+                        })),
+                    );
+                } catch (error) {
+                    console.error('Lỗi khi tải chi tiết sản phẩm:', error);
+                    setError('Không thể tải chi tiết sản phẩm.');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchProductDetails();
+    }, [open, productID]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const apiData = await fetchCategoryAPI();
+                const categoryOptions = apiData.map((category) => ({
+                    value: category.category_name,
+                    label: category.category_name,
+                    children: category.subcategories.map((sub) => ({
+                        value: sub.id,
+                        label: sub.SupCategoryName,
+                    })),
+                }));
+                setCategories(categoryOptions);
+            } catch (error) {
+                console.error('Lỗi khi tải danh mục:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -44,212 +93,54 @@ function ProductEditModal({ open, onClose, productID }) {
         setPreviewOpen(true);
     };
 
-    // const handleAddVariant = () => {
-    //     setVariants([...variants, { size: '', stock: '', price: '' }]);
-    // };
-
-    // const handleRemoveVariant = (index) => {
-    //     setVariants(variants.filter((_, i) => i !== index));
-    // };
-
-    // const handleVariantChange = (index, field, value) => {
-    //     const newVariants = [...variants];
-    //     newVariants[index][field] = value;
-    //     setVariants(newVariants);
-    // };
-
     const handleChange = ({ fileList: newFileList }) => {
         setFileList(newFileList);
-        const uploadingFiles = newFileList.filter((file) => file.status === 'uploading');
-        setNewFiles(uploadingFiles);
     };
 
     const handleRemoveImage = (file) => {
-        setIdImgDeleted((prevIdImgDeleted) => [...prevIdImgDeleted, file.image_id]);
-
-        console.log('data', idImgDeleted);
-
+        setIdImgDeleted((prev) => [...prev, file.image_id]);
         setFileList(fileList.filter((item) => item.image_id !== file.image_id));
     };
 
-    // const handleStatusChange = (index, value) => {
-    //     const newVariants = [...variants];
-    //     newVariants[index].isDelete = value;
-    //     setVariants(newVariants);
-    // };
-
-    // const columns = [
-    //     {
-    //         title: 'ID',
-    //         dataIndex: 'id',
-    //         key: 'id',
-    //         render: (text) => text || '-',
-    //     },
-    //     {
-    //         title: 'Size',
-    //         dataIndex: 'size',
-    //         key: 'size',
-    //         render: (_, record, index) => (
-    //             <Input
-    //                 value={record.size}
-    //                 onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-    //                 placeholder="Variant Size"
-    //             />
-    //         ),
-    //     },
-    //     {
-    //         title: 'Stock',
-    //         dataIndex: 'stock',
-    //         key: 'stock',
-    //         render: (_, record, index) => (
-    //             <Input
-    //                 value={record.stock}
-    //                 onChange={(e) => handleVariantChange(index, 'stock', e.target.value)}
-    //                 placeholder="Stock"
-    //                 type="number"
-    //                 min={0}
-    //             />
-    //         ),
-    //     },
-    //     {
-    //         title: 'Price',
-    //         dataIndex: 'price',
-    //         key: 'price',
-    //         render: (_, record, index) => (
-    //             <Input
-    //                 value={record.price}
-    //                 onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
-    //                 placeholder="Price"
-    //                 type="number"
-    //                 min={0}
-    //             />
-    //         ),
-    //     },
-    //     {
-    //         title: 'Status',
-    //         dataIndex: 'isDelete',
-    //         key: 'isDelete',
-    //         render: (_, record, index) =>
-    //             record.id !== undefined ? (
-    //                 <Select
-    //                     value={record.isDelete !== undefined ? record.isDelete : 0} // Hiển thị giá trị hiện tại hoặc giá trị mặc định
-    //                     onChange={(value) => handleVariantChange(index, 'isDelete', value)}
-    //                     style={{ width: '100%' }}
-    //                     loading={!record.isDelete && !record.id} // Hiển thị trạng thái loading khi cần
-    //                 >
-    //                     <Select.Option value={1}>Ngừng kinh doanh</Select.Option>
-    //                     <Select.Option value={0}>Còn kinh doanh</Select.Option>
-    //                 </Select>
-    //             ) : null,
-    //     },
-
-    //     {
-    //         title: 'Action',
-    //         key: 'action',
-    //         render: (_, record, index) =>
-    //             !record.id && (
-    //                 <Button type="danger" icon={<DeleteOutlined />} onClick={() => handleRemoveVariant(index)} />
-    //             ),
-    //     },
-    // ];
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (open && productID) {
-                setLoading(true);
-                setError(null);
-                try {
-                    const data = await fetchProductByIdAPI(productID);
-                    console.log(data);
-                    setProductName(data.productName);
-                    setSubCategory(data.subcategory_name);
-                    setContent(data.description);
-                    const updatedFileList = data.images.map((image) => ({
-                        uid: image.image_id,
-                        name: `image-${image.image_id}`,
-                        status: 'done',
-                        url: image.image_url,
-                        image_id: image.image_id,
-                    }));
-                    setFileList(updatedFileList);
-                    setVariants(
-                        data.variations.map((v) => ({
-                            id: v.variation_id,
-                            size: v.size,
-                            price: v.price,
-                            stock: v.stock,
-                        })),
-                    );
-
-                    console.log('variants data', variants);
-                } catch (error) {
-                    console.error('Lỗi khi tải dữ liệu sản phẩm:', error);
-                    setError('Không thể tải chi tiết sản phẩm.');
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-        fetchData();
-    }, [open, productID]);
-
     const handleUpdateProduct = async () => {
-        setLoading(true);
-
-        if (
-            !productName ||
-            !subCategory ||
-            variants.some((variant) => !variant.size || !variant.stock || !variant.price)
-        ) {
+        if (!productName || !subCategoryID) {
             message.error('Vui lòng điền đầy đủ thông tin trước khi cập nhật!');
             return;
         }
+
+        setLoading(true);
         try {
-            if (fileList.length > 0) {
-                const formData = new FormData();
-                formData.append('ProductID', productID || '');
-
-                fileList.forEach((file) => {
-                    console.log('File to upload log:', file.originFileObj);
-                    formData.append('images', file.originFileObj);
-                });
-
-                await addImageAPI(formData);
-                message.success('Cập nhật hình ảnh sản phẩm thành công!');
-            }
-
+            // Xóa hình ảnh
             if (idImgDeleted.length > 0) {
-                const deleteData = { ids: idImgDeleted };
-                console.log('Data xóa:', deleteData);
-
-                await removeImageAPI(deleteData);
-                message.success('Xóa hình ảnh sản phẩm thành công!');
+                await removeImageAPI({ ids: idImgDeleted });
+                message.success('Xóa hình ảnh thành công!');
             }
 
-            const newVariants = variants.filter((variant) => !variant.id);
-            const newVariantData = newVariants.map((variant) => ({
-                ID_Product: productID,
-                size: variant.size,
-                Price: parseInt(variant.price),
-                stock: parseInt(variant.stock),
-            }));
-
-            if (newVariantData.length > 0) {
-                console.log('Variants để thêm:', newVariantData);
-                await addVariationAPI(newVariantData);
-                message.success('Thêm biến thể mới thành công!');
+            // Thêm hình ảnh mới
+            const formData = new FormData();
+            formData.append('ProductID', productID);
+            fileList
+                .filter((file) => file.originFileObj)
+                .forEach((file) => formData.append('images', file.originFileObj));
+            if (formData.has('images')) {
+                await addImageAPI(formData);
+                message.success('Cập nhật hình ảnh thành công!');
             }
 
-            const updatedVariants = variants.map((variant) => ({
-                ...variant,
-                Price: parseInt(variant.price),
-            }));
+            const productData = {
+                ID_SupCategory: subCategoryID,
+                productName: productName,
+                description: content,
+            };
+            console.log('data id', productID);
+            console.log('dât form', productData);
 
-            console.log('Variants đã thay đổi:', updatedVariants);
-            await updateVariationAPI(updatedVariants);
-            message.success('Cập nhật biến thể thành công!');
+            await updateProductAPI(productID, productData);
+
+            message.success('Cập nhật sản phẩm thành công!');
         } catch (error) {
-            message.error('Cập nhật sản phẩm không thành công.');
+            message.error('Cập nhật sản phẩm thất bại.');
+            console.error('Lỗi:', error);
         } finally {
             setLoading(false);
         }
@@ -263,43 +154,39 @@ function ProductEditModal({ open, onClose, productID }) {
             onCancel={onClose}
             okText="Cập nhật"
             cancelText="Hủy"
+            confirmLoading={loading}
             className={cx('wrapper')}
             width={1100}
-            confirmLoading={loading}
         >
             <AntRow gutter={16}>
                 <Col span={16}>
                     <AntRow gutter={16}>
-                        <Col className={cx('form-input')} span={24}>
-                           <label>Tên sản phẩm</label>
+                        <Col span={24}>
+                            <label>Tên sản phẩm</label>
                             <Input
                                 placeholder="Tên sản phẩm"
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
                             />
                         </Col>
-                        <Col className={cx('form-input')} span={12}>
-                           <label>Danh mục</label>
-                            <Input placeholder="Danh mục" />
-                        </Col>
-                        <Col className={cx('form-input')} span={12}>
-                           <label>Danh mục con</label>
-                            <Input
-                                placeholder="Danh mục con"
-                                value={subCategory}
-                                onChange={(e) => setSubCategory(e.target.value)}
+                        <Col span={24}>
+                            <label>Danh mục</label>
+                            <Cascader
+                                className={cx('cascader-custom')}
+                                options={categories}
+                                value={subCategoryName ? [subCategoryName] : []}
+                                placeholder="Chọn danh mục"
+                                onChange={(value, selectedOptions) => {
+                                    setSubCategoryID(value[1] || '');
+                                    setSubCategoryName(selectedOptions[1]?.label || '');
+                                }}
                             />
                         </Col>
-                        <Col span={24} className={cx('box-content')}>
-                            <SummernoteEditor
-                                className={cx('txt-description')}
-                                content={content}
-                                setContent={setContent}
-                            />
+                        <Col span={24}>
+                            <SummernoteEditor content={content} setContent={setContent} />
                         </Col>
                     </AntRow>
                 </Col>
-
                 <Col span={8}>
                     <Upload
                         listType="picture-card"
@@ -310,28 +197,23 @@ function ProductEditModal({ open, onClose, productID }) {
                         maxCount={8}
                         multiple
                     >
-                        {fileList.length >= 8 ? null : (
-                            <div className={cx('fileList-upload')}>
-                                <PlusOutlined className={cx('plusoutline')} />
-                                <div className={cx('upload')}>Tải ảnh lên</div>
+                        {fileList.length < 8 && (
+                            <div>
+                                <PlusOutlined />
+                                <div>Upload</div>
                             </div>
                         )}
                     </Upload>
-                    {previewImage && (
-                        <Image
-                            wrapperStyle={{ display: 'none' }}
-                            preview={{
-                                visible: previewOpen,
-                                onVisibleChange: (visible) => setPreviewOpen(visible),
-                                afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                            }}
-                            src={previewImage}
-                        />
-                    )}
+                    <Image
+                        preview={{
+                            visible: previewOpen,
+                            onVisibleChange: (visible) => setPreviewOpen(visible),
+                        }}
+                        src={previewImage}
+                        style={{ display: 'none' }}
+                    />
                 </Col>
             </AntRow>
-
-
             {error && <p className={cx('error-message')}>{error}</p>}
         </Modal>
     );
