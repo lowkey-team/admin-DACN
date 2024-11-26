@@ -1,0 +1,119 @@
+.container {
+    padding: 16px;
+    font-family: Arial, sans-serif;
+    color: #333;
+
+    h6 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    p {
+        margin: 4px 0;
+    }
+
+    .info-section {
+        margin-bottom: 16px;
+        border: 1px solid #e6e6e6;
+        border-radius: 10px;
+        min-height: 140px;
+
+        &-header {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &-content {
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .header-Title {
+            padding: 10px;
+            background-color: #e6e6e6;
+            border: 1px solid #e6e6e6;
+            border-top-left-radius: 9px;
+            border-top-right-radius: 9px;
+        }
+        .content-info {
+            padding: 10px;
+        }
+        .box-info {
+            padding: 10px;
+            background-color: #555;
+        }
+    }
+}
+
+.table-container {
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+
+    .MuiTable-root {
+        width: 100%;
+        font-size: 14px;
+
+        .MuiTableHead-root {
+            background-color: #f5f5f5;
+
+            .MuiTableCell-head {
+                font-weight: bold;
+                text-align: center;
+            }
+        }
+
+        .MuiTableCell-body {
+            text-align: center;
+        }
+
+        .product-name {
+            text-align: left;
+        }
+
+        .barcode {
+            color: #888;
+            font-size: 12px;
+        }
+    }
+}
+
+.payment-summary {
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+
+        &.total {
+            font-weight: bold;
+            font-size: 16px;
+            color: #d32f2f;
+        }
+    }
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+
+    button {
+        font-size: 14px;
+    }
+}
+.barcode-container {
+    width: 200px;
+    height: 50px;
+}
+.col-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
