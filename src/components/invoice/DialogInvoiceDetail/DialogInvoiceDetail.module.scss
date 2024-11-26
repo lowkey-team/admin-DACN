@@ -117,3 +117,26 @@
     flex-direction: column;
     gap: 10px;
 }
+.payment-summary {
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .title {
+            text-align: left;
+            flex: 1; /* Chiếm bên trái */
+        }
+
+        .value {
+            text-align: right;
+            flex: 1; /* Chiếm bên phải */
+        }
+    }
+
+    .total {
+        color: red;
+        font-weight: bold;
+    }
+}
