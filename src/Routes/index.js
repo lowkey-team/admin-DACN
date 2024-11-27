@@ -4,11 +4,9 @@ import CategoryManager from '~/pages/CategoryManager';
 import CustomerManagement from '~/pages/CustomerManagement';
 import Invoice from '~/pages/Invoice';
 import Product from '~/pages/Product';
-import Profile from '~/pages/Product';
 //Public Routes
 const publicRoutes = [
-    { path: '/', component: Product },
-    { path: '/p', component: Profile },
+    { path: '/product', component: Product },
     { path: '/addmoreproduct', component: AddMoreProduct },
     { path: '/customer', component: CustomerManagement },
     { path: '/invoice', component: Invoice },

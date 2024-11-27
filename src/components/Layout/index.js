@@ -15,6 +15,7 @@ import {
 import { Button, Layout, Menu, theme, Dropdown } from 'antd';
 import classNames from 'classnames/bind';
 import style from './Layout.module.scss';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(style);
 const { Header, Sider, Content } = Layout;
@@ -77,8 +78,23 @@ const App = ({ children }) => {
                         className={cx('custom-menu-item', { selected: selectedKey === '2' })}
                         onClick={() => handleMenuItemClick('2')}
                         style={{ color: textColor }}
+                        href="/product"
                     >
-                       Sản phẩm
+                        <Link to="/product" className={cx('text-Decoration_none')}>
+                            Sản phẩm
+                        </Link>
+                    </Menu.Item>
+
+                    <Menu.Item
+                        key="8"
+                        icon={<UnorderedListOutlined />}
+                        className={cx('custom-menu-item', { selected: selectedKey === '8' })}
+                        onClick={() => handleMenuItemClick('8')}
+                        style={{ color: textColor }}
+                    >
+                        <Link to="/category" className={cx('text-Decoration_none')}>
+                            Danh mục
+                        </Link>
                     </Menu.Item>
                     <SubMenu
                         key="sub1"
@@ -93,7 +109,9 @@ const App = ({ children }) => {
                             onClick={() => handleMenuItemClick('3')}
                             style={{ color: collapsed ? '#000' : textColor }}
                         >
-                           Đơn hàng đã đặt
+                            <Link to="/invoice" className={cx('text-Decoration_none')}>
+                                Đơn hàng
+                            </Link>
                         </Menu.Item>
                         <Menu.Item
                             key="4"
@@ -101,7 +119,9 @@ const App = ({ children }) => {
                             onClick={() => handleMenuItemClick('4')}
                             style={{ color: collapsed ? '#000' : textColor }}
                         >
-                            Chi tiết đơn hàng
+                            <Link to="/invoice" className={cx('text-Decoration_none')}>
+                                Đơn trả hàng
+                            </Link>
                         </Menu.Item>
                         <Menu.Item
                             key="5"
@@ -119,7 +139,9 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('6')}
                         style={{ color: textColor }}
                     >
-                        Khách hàng
+                        <Link to="/customer" className={cx('text-Decoration_none')}>
+                            Khách hàng
+                        </Link>
                     </Menu.Item>
                     <Menu.Item
                         key="7"
@@ -128,17 +150,9 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('7')}
                         style={{ color: textColor }}
                     >
-                       Nhân viên
+                        Nhân viên
                     </Menu.Item>
-                    <Menu.Item
-                        key="8"
-                        icon={<UnorderedListOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '8' })}
-                        onClick={() => handleMenuItemClick('8')}
-                        style={{ color: textColor }}
-                    >
-                        Danh mục
-                    </Menu.Item>
+
                     <Menu.Item
                         key="9"
                         icon={<PieChartOutlined />}
@@ -146,7 +160,7 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('9')}
                         style={{ color: textColor }}
                     >
-                       Báo cáo & Thống kê
+                        Báo cáo & Thống kê
                     </Menu.Item>
                     <Menu.Item
                         key="10"
@@ -155,7 +169,7 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('10')}
                         style={{ color: textColor }}
                     >
-                       Blog
+                        Blog
                     </Menu.Item>
                     <Menu.Item
                         key="11"
@@ -173,7 +187,7 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('12')}
                         style={{ color: textColor }}
                     >
-                       Giảm giá
+                        Giảm giá
                     </Menu.Item>
                 </Menu>
             </Sider>
