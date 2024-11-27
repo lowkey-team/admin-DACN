@@ -1,5 +1,6 @@
 // HeaderOnly Layout
 import AddMoreProduct from '~/pages/AddMoreProduct';
+import CategoryManager from '~/pages/CategoryManager';
 import CustomerManagement from '~/pages/CustomerManagement';
 import Invoice from '~/pages/Invoice';
 import Product from '~/pages/Product';
@@ -11,6 +12,7 @@ const publicRoutes = [
     { path: '/addmoreproduct', component: AddMoreProduct },
     { path: '/customer', component: CustomerManagement },
     { path: '/invoice', component: Invoice },
+    { path: '/category', component: CategoryManager },
 ];
 
 //Private Routers
