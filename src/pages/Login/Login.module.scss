@@ -1,0 +1,99 @@
+$primary-color: #ff5e78;
+$secondary-color: #fdf4f8;
+$text-color: #333;
+$background-color: #fff;
+
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, $secondary-color, $primary-color);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: $background-color;
+    padding: 30px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+        }
+    }
+
+    .title {
+        font-size: 1.8rem;
+        color: $primary-color;
+        margin-bottom: 20px;
+    }
+
+    .form {
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+
+            label {
+                display: block;
+                font-size: 1.6rem;
+                color: $text-color;
+                margin-bottom: 5px;
+            }
+
+            input {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 1.4rem;
+
+                &:focus {
+                    border-color: $primary-color;
+                    outline: none;
+                    box-shadow: 0 0 5px rgba(255, 94, 120, 0.5);
+                }
+            }
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: $primary-color;
+            color: $background-color;
+            font-size: 1.6rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: darken($primary-color, 10%);
+            }
+        }
+    }
+
+    .footer {
+        margin-top: 20px;
+
+        a {
+            color: $primary-color;
+            font-size: 1.4rem;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
