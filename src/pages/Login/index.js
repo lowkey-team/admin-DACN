@@ -1,71 +1,92 @@
-import React, { useState } from "react";
-import { Modal } from "antd";
-import classNames from "classnames/bind";
-import styles from "./Login.module.scss";
+import React, { useState } from 'react';
+import { Modal, Input, Button, Form, message } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import classNames from 'classnames/bind';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import styles from './Login.module.scss';
+
+import { loginAdminAPI } from '~/apis/Auth';
 
 const cx = classNames.bind(styles);
 
 function Login() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsModalOpen(true);
-    setTimeout(() => {
-      setIsModalOpen(false);
-    }, 2000);
-  };
+    const handleSubmit = async (values) => {
+        const { phone, password } = values;
 
-  return (
-    <div className={cx("wrapper")}>
-      <div className={cx("login-container")}>
-        <div className={cx("logo")}>
-          <img
-            src="https://picsum.photos/300/300"
-            alt="Logo"
-          />
+        setLoading(true);
+
+        try {
+            const response = await loginAdminAPI({ phone, password });
+            setIsModalOpen(true);
+            sessionStorage.setItem('token', response.token);
+            sessionStorage.setItem('id', response.id);
+            sessionStorage.setItem('fullName', response.fullName);
+            setTimeout(() => {
+                setIsModalOpen(false);
+                navigate('/product');
+            }, 1000);
+
+            console.log('Đăng nhập thành công:', response);
+        } catch (error) {
+            setLoading(false);
+            message.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin');
+            console.error('Lỗi đăng nhập:', error);
+        }
+    };
+
+    return (
+        <div className={cx('wrapper')}>
+            <div className={cx('login-container')}>
+                <div className={cx('logo')}>
+                    <img src="https://picsum.photos/300/300" alt="Logo" />
+                </div>
+                <h2 className={cx('title')}>Chào mừng</h2>
+                <Form onFinish={handleSubmit} className={cx('form')}>
+                    <Form.Item
+                        name="phone"
+                        rules={[
+                            { required: true, message: 'Vui lòng nhập số điện thoại của bạn!' },
+                            { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ!' },
+                        ]}
+                    >
+                        <Input
+                            prefix={<UserOutlined />}
+                            type="tel"
+                            placeholder="Nhập số điện thoại của bạn"
+                            maxLength={10}
+                        />
+                    </Form.Item>
+
+                    <Form.Item name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
+                        <Input.Password prefix={<LockOutlined />} type="password" placeholder="Nhập mật khẩu" />
+                    </Form.Item>
+
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            block
+                            loading={loading} // Thêm trạng thái loading cho button
+                        >
+                            Đăng Nhập
+                        </Button>
+                    </Form.Item>
+                </Form>
+
+                <div className={cx('footer')}>
+                    <a href="/forgot-password">Quên mật khẩu?</a>
+                </div>
+            </div>
+
+            <Modal title="Thông báo" open={isModalOpen} footer={null} closable={false}>
+                <p>Đăng nhập thành công! Chào mừng bạn.</p>
+            </Modal>
         </div>
-        <h2 className={cx("title")}>Chào mừng</h2>
-        <form className={cx("form")} onSubmit={handleSubmit}>
-          <div className={cx("input-group")}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Nhập email của bạn"
-              required
-            />
-          </div>
-          <div className={cx("input-group")}>
-            <label htmlFor="password">Mật khẩu</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Nhập mật khẩu"
-              required
-            />
-          </div>
-          <button type="submit" className={cx("login-button")}>
-            Đăng Nhập
-          </button>
-        </form>
-        <div className={cx("footer")}>
-          <a href="/forgot-password">Quên mật khẩu?</a>
-        </div>
-      </div>
-
-      <Modal
-        title="Thông báo"
-        open={isModalOpen}
-        footer={null} 
-        closable={false}
-      >
-        <p>Đăng nhập thành công! Chào mừng bạn.</p>
-      </Modal>
-    </div>
-  );
+    );
 }
 
 export default Login;

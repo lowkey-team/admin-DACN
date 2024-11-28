@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -10,12 +10,13 @@ import {
     PieChartOutlined,
     FileTextOutlined,
     CustomerServiceOutlined,
+    LogoutOutlined,
     TagOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, theme, Dropdown } from 'antd';
+import { Button, Layout, Menu, theme, Dropdown, message } from 'antd';
 import classNames from 'classnames/bind';
 import style from './Layout.module.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(style);
 const { Header, Sider, Content } = Layout;
@@ -39,10 +40,20 @@ const App = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [selectedColor, setSelectedColor] = useState('#9CD3D8');
     const [selectedKey, setSelectedKey] = useState(null);
+    const [userName, setUserName] = useState('');
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
+    useEffect(() => {
+        const fullName = sessionStorage.getItem('fullName');
+        console.log(fullName);
+        if (fullName) {
+            setUserName(fullName);
+        }
+    }, []);
+
+    const navigate = useNavigate();
     const handleColorChange = (color) => {
         setSelectedColor(color);
     };
@@ -52,6 +63,14 @@ const App = ({ children }) => {
     };
 
     const textColor = getTextColor(selectedColor);
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('id');
+        sessionStorage.removeItem('fullName');
+        message.success('Đăng xuất thành công');
+        navigate('/');
+    };
 
     return (
         <Layout className={cx('wrapper')}>
@@ -214,6 +233,20 @@ const App = ({ children }) => {
                     >
                         <Button style={{ backgroundColor: selectedColor, color: textColor }}>Chọn màu Theme</Button>
                     </Dropdown>
+
+                    <div className={cx('user-info')}>
+                        <Button type="link" style={{ color: textColor }}>
+                            {userName ? `Xin chào, ${userName}` : 'Chào mừng'}
+                        </Button>
+                        <Button
+                            type="link"
+                            icon={<LogoutOutlined />}
+                            style={{ color: textColor }}
+                            onClick={handleLogout}
+                        >
+                            Đăng xuất
+                        </Button>
+                    </div>
                 </Header>
                 <Content
                     className={cx('content')}
