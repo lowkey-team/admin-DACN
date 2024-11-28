@@ -27,6 +27,8 @@ function Login() {
             sessionStorage.setItem('fullName', response.fullName);
             setTimeout(() => {
                 setIsModalOpen(false);
+                console.log('Đăng nhập thành công fgvhbn:', response);
+
                 navigate('/product');
             }, 1000);
 
