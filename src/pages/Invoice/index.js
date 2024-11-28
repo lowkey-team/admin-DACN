@@ -7,7 +7,7 @@ const cx = classNames.bind(styles);
 function Invoice() {
     return (
         <div className={cx('wrapper')}>
-            <h1 className={cx('title')}>Hóa đơn</h1>
+            <h1 className={cx('title')}>Hóa đơn bán hàng</h1>
             <div className={cx('content')}>
                 <DataGridProDemo />
             </div>

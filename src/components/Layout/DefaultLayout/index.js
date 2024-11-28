@@ -174,7 +174,29 @@ const App = ({ children }) => {
                     >
                         Nhân viên
                     </Menu.Item>
+                    <Menu.Item
+                        key="17"
+                        icon={<TeamOutlined />}
+                        className={cx('custom-menu-item', { selected: selectedKey === '17' })}
+                        onClick={() => handleMenuItemClick('17')}
+                        style={{ color: textColor }}
+                    >
+                        <Link to="/supplier" className={cx('text-Decoration_none')}>
+                            Nhà cung cấp
+                        </Link>
+                    </Menu.Item>
 
+                    <Menu.Item
+                        key="18"
+                        icon={<TeamOutlined />}
+                        className={cx('custom-menu-item', { selected: selectedKey === '18' })}
+                        onClick={() => handleMenuItemClick('18')}
+                        style={{ color: textColor }}
+                    >
+                        <Link to="/supplier" className={cx('text-Decoration_none')}>
+                            Quản lý kho
+                        </Link>
+                    </Menu.Item>
                     <Menu.Item
                         key="9"
                         icon={<PieChartOutlined />}
@@ -202,6 +224,7 @@ const App = ({ children }) => {
                     >
                         Hỗ trợ khách hàng
                     </Menu.Item>
+
                     <Menu.Item
                         key="12"
                         icon={<TagOutlined />}

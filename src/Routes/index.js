@@ -28,10 +28,12 @@ import CustomerManagement from '~/pages/CustomerManagement';
 import Invoice from '~/pages/Invoice';
 import Login from '~/pages/Login';
 import Product from '~/pages/Product';
+import Supplier from '~/pages/SupplierManager';
 
 const publicRoutes = [{ path: '/', component: Login, layout: null }];
 
 const privateRoutes = [
+    { path: '/supplier', component: Supplier },
     { path: '/product', component: Product },
     { path: '/addmoreproduct', component: AddMoreProduct },
     { path: '/customer', component: CustomerManagement },
