@@ -1,13 +1,12 @@
-import { Navigate, useLocation } from 'react-router-dom';
-
-const isAuthenticated = () => {
-    return sessionStorage.getItem('token');
-};
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const PrivateRoute = ({ children }) => {
-    const location = useLocation();
+    const { token } = useSelector((state) => state.user);
 
-    return isAuthenticated() ? children : <Navigate to="/" state={{ from: location }} replace />;
+    const isAuthenticated = token || sessionStorage.getItem('token');
+
+    return isAuthenticated ? children : <Navigate to="/" />;
 };
 
 export default PrivateRoute;

@@ -13,12 +13,13 @@ import {
 } from '~/apis/category';
 import classNames from 'classnames/bind';
 import style from './category.module.scss';
+import { useSelector, useDispatch } from 'react-redux';
+import { userSlice } from '~/redux/userSlice';
 
 const cx = classNames.bind(style);
 export default function CollapsibleTable() {
     const [categories, setCategories] = useState([]);
-
-    // Function to fetch categories from the server
+    const userPermissions = useSelector((state) => state.user.permissions);
     const fetchCategories = async () => {
         try {
             const response = await getAllCategoryAPI();
@@ -32,7 +33,6 @@ export default function CollapsibleTable() {
         }
     };
 
-    // UseEffect to load categories when the component mounts
     useEffect(() => {
         fetchCategories();
     }, []);
@@ -124,6 +124,10 @@ export default function CollapsibleTable() {
         }
     };
 
+    const canAddCategory = userPermissions.includes('CREATE_CATEGORY');
+    const canEditCategory = userPermissions.includes('UPDATE_CATEGORY');
+    const canDeleteCategory = userPermissions.includes('DELETE_CATEGORY');
+
     return (
         <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
@@ -133,9 +137,11 @@ export default function CollapsibleTable() {
                         <TableCell>ID</TableCell>
                         <TableCell>Tên danh mục</TableCell>
                         <TableCell align="right">
-                            <Button size="small" variant="outlined" startIcon={<Add />} onClick={handleAddCategory}>
-                                Thêm danh mục
-                            </Button>
+                            {canAddCategory && (
+                                <Button size="small" variant="outlined" startIcon={<Add />} onClick={handleAddCategory}>
+                                    Thêm danh mục
+                                </Button>
+                            )}
                         </TableCell>
                     </TableRow>
                 </TableHead>

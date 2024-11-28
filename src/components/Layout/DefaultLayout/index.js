@@ -17,6 +17,8 @@ import { Button, Layout, Menu, theme, Dropdown, message } from 'antd';
 import classNames from 'classnames/bind';
 import style from './Layout.module.scss';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearUser } from '~/redux/userSlice';
 
 const cx = classNames.bind(style);
 const { Header, Sider, Content } = Layout;
@@ -54,6 +56,9 @@ const App = ({ children }) => {
     }, []);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { fullName } = useSelector((state) => state.user);
     const handleColorChange = (color) => {
         setSelectedColor(color);
     };
@@ -65,9 +70,7 @@ const App = ({ children }) => {
     const textColor = getTextColor(selectedColor);
 
     const handleLogout = () => {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('id');
-        sessionStorage.removeItem('fullName');
+        dispatch(clearUser());
         message.success('Đăng xuất thành công');
         navigate('/');
     };
@@ -234,19 +237,19 @@ const App = ({ children }) => {
                         <Button style={{ backgroundColor: selectedColor, color: textColor }}>Chọn màu Theme</Button>
                     </Dropdown>
 
-                    <div className={cx('user-info')}>
-                        <Button type="link" style={{ color: textColor }}>
-                            {userName ? `Xin chào, ${userName}` : 'Chào mừng'}
-                        </Button>
-                        <Button
-                            type="link"
-                            icon={<LogoutOutlined />}
-                            style={{ color: textColor }}
-                            onClick={handleLogout}
-                        >
-                            Đăng xuất
-                        </Button>
-                    </div>
+                    <Button
+                        type="link"
+                        icon={<LogoutOutlined />}
+                        style={{ color: textColor }}
+                        onClick={handleLogout}
+                        className={cx('box-info')}
+                        danger
+                    >
+                        Đăng xuất
+                    </Button>
+                    <Button type="link" style={{ color: textColor }} className={cx('box-info')}>
+                        {fullName ? `Xin chào, ${fullName}` : 'Chào mừng'}
+                    </Button>
                 </Header>
                 <Content
                     className={cx('content')}

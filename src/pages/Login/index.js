@@ -4,6 +4,8 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import classNames from 'classnames/bind';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 import styles from './Login.module.scss';
+import { useDispatch } from 'react-redux';
+import { setUser } from '~/redux/userSlice';
 
 import { loginAdminAPI } from '~/apis/Auth';
 
@@ -13,6 +15,7 @@ function Login() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleSubmit = async (values) => {
         const { phone, password } = values;
@@ -22,9 +25,27 @@ function Login() {
         try {
             const response = await loginAdminAPI({ phone, password });
             setIsModalOpen(true);
-            sessionStorage.setItem('token', response.token);
-            sessionStorage.setItem('id', response.id);
-            sessionStorage.setItem('fullName', response.fullName);
+            sessionStorage.setItem(
+                'user',
+                JSON.stringify({
+                    id: response.id,
+                    fullName: response.fullName,
+                    roles: response.roles,
+                    permissions: response.permissions,
+                    token: response.token,
+                }),
+            );
+
+            dispatch(
+                setUser({
+                    id: response.id,
+                    fullName: response.fullName,
+                    roles: response.roles,
+                    permissions: response.permissions,
+                    token: response.token,
+                }),
+            );
+
             setTimeout(() => {
                 setIsModalOpen(false);
                 console.log('Đăng nhập thành công fgvhbn:', response);
@@ -68,12 +89,7 @@ function Login() {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            block
-                            loading={loading} // Thêm trạng thái loading cho button
-                        >
+                        <Button type="primary" htmlType="submit" block loading={loading}>
                             Đăng Nhập
                         </Button>
                     </Form.Item>
