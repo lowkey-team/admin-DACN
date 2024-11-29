@@ -138,7 +138,8 @@ export default function TableCollapsibleRow() {
                     </Col>
                 </div>
             </AntRow>
-            <ProductFilters
+
+           <ProductFilters
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 categories={categories}
@@ -157,7 +158,7 @@ export default function TableCollapsibleRow() {
                 pageSize={rowsPerPage}
                 onChange={(page) => setCurrentPage(page)}
                 style={{ marginTop: '16px', textAlign: 'right' }}
-            />
+            /> 
             <ProductFormModal open={isModalOpen} onClose={hideModal} />
         </>
     );

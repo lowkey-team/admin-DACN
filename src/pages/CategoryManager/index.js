@@ -20,6 +20,7 @@ const cx = classNames.bind(style);
 export default function CollapsibleTable() {
     const [categories, setCategories] = useState([]);
     const userPermissions = useSelector((state) => state.user.permissions);
+    
     const fetchCategories = async () => {
         try {
             const response = await getAllCategoryAPI();
