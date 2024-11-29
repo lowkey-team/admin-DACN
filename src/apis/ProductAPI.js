@@ -82,3 +82,8 @@ export const fetchInvoiceAllAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/invoices/invoicesAll`);
     return response;
 };
+
+export const fetchProductByIdSupCategoryAPI = async (id) => {
+    const response = await axios.get(`${API_ROOT}/v1/product/getProductBySupAdmin/${id}`);
+    return response.data;
+};

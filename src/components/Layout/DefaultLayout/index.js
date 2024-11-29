@@ -193,7 +193,7 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('18')}
                         style={{ color: textColor }}
                     >
-                        <Link to="/warehouse" className={cx('text-Decoration_none')}>
+                        <Link to="/WarehouseManager" className={cx('text-Decoration_none')}>
                             Quản lý kho
                         </Link>
                     </Menu.Item>
