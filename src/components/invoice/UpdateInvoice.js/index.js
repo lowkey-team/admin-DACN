@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Form, Select, Button, notification } from 'antd';
+import { Modal, Form, Select, Button, notification, Tag  } from 'antd';
 import { updateInvoiceStatusAPI } from '~/apis/invoice';
 
 const { Option } = Select;
@@ -35,7 +35,7 @@ const UpdateInvoice = ({ visible, onCancel, onUpdateStatus, invoice_id, currentS
                 name="update-order-status"
                 onFinish={handleUpdateStatus}
                 initialValues={{
-                    paymentStatus: 'pending',
+                    paymentStatus: onPaymentStatusUpdate,
                     orderStatus: currentStatus || 'pending',
                 }}
             >
@@ -45,9 +45,8 @@ const UpdateInvoice = ({ visible, onCancel, onUpdateStatus, invoice_id, currentS
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái thanh toán!' }]}
                 >
                     <Select>
-                        <Option value="Đang chờ thanh toán">Đang chờ thanh toán</Option>
-                        <Option value="Đã thanh toán">Đã thanh toán</Option>
-                        <Option value="Thanh Toán thât bại">Thanh toán thất bại</Option>
+                        <Option value="Đang chờ thanh toán"><Tag color="gold">Đang chờ thanh toán</Tag></Option>
+                        <Option value="Đã thanh toán"> <Tag color="green">Đã thanh toán</Tag></Option>
                     </Select>
                 </Form.Item>
 
@@ -57,11 +56,14 @@ const UpdateInvoice = ({ visible, onCancel, onUpdateStatus, invoice_id, currentS
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái đơn hàng!' }]}
                 >
                     <Select>
-                        <Option value="Đang chờ xử lý">Đang chờ xử lý</Option>
-                        <Option value="Đang xử lý">Đang xử lý</Option>
-                        <Option value="Đã giao">Đã giao</Option>
-                        <Option value="Đã nhận">Đã nhận</Option>
-                        <Option value="Đã hủy">Đã hủy</Option>
+                        <Option value="Chờ thanh toán"> <Tag color="blue">Chờ thanh toán</Tag></Option>
+                        <Option value="Đang xử lý"><Tag color="lime">Đang xử lý</Tag></Option>
+                        <Option value="Chờ lấy hàng"> <Tag color="gold">Chờ lấy hàng</Tag></Option>
+                        <Option value="Chờ giao hàng"> <Tag color="magenta">Chờ giao hàng</Tag></Option>
+                        <Option value="Trả hàng"> <Tag color="purple">Trả hàng</Tag></Option>
+                        <Option value="Được giao"> <Tag color="green">Được giao</Tag></Option>
+                        <Option value="Đã hủy"> <Tag color="red">Đã hủy</Tag></Option>
+
                     </Select>
                 </Form.Item>
 
