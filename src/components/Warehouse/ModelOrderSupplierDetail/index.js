@@ -22,6 +22,14 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
     const componentRef = useRef();
     const [totalAmount, setTotalAmount] = useState(0);
 
+    const [orderStatus, setOrderStatus] = useState('');
+    const [paymentStatus, setPaymentStatus] = useState('');
+
+    useEffect(() => {
+        setOrderStatus(invoiceDetails?.order_status);
+        setPaymentStatus(invoiceDetails?.payment_status);
+    }, [invoiceDetails]);
+
     useEffect(() => {
         console.log('Data orderSupplierDetail (as JSON):', JSON.stringify(invoiceDetails, null, 2));
         if (open && invoiceDetails && invoiceDetails.id) {
@@ -318,10 +326,8 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
 
                                         <Typography.Text>
                                             Trạng thái đơn hàng:
-                                            <Tag
-                                                color={invoiceDetails.order_status === 'Chưa giao' ? 'volcano' : 'cyan'}
-                                            >
-                                                {invoiceDetails.order_status}
+                                            <Tag color={orderStatus === 'Chưa giao' ? 'volcano' : 'cyan'}>
+                                                {orderStatus}
                                             </Tag>
                                         </Typography.Text>
                                     </Col>
@@ -338,14 +344,8 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
                                         <div className={cx('content-info')}>
                                             <Typography.Text>
                                                 Trạng thái thanh toán:
-                                                <Tag
-                                                    color={
-                                                        invoiceDetails.payment_status === 'Chưa thanh toán'
-                                                            ? 'volcano'
-                                                            : 'cyan'
-                                                    }
-                                                >
-                                                    {invoiceDetails.payment_status}
+                                                <Tag color={paymentStatus === 'Chưa thanh toán' ? 'volcano' : 'cyan'}>
+                                                    {paymentStatus}
                                                 </Tag>
                                             </Typography.Text>
                                             <br />
@@ -379,9 +379,11 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
                                 visible={isModalVisible}
                                 onCancel={handleCancel}
                                 onUpdateStatus={handleUpdateStatus}
-                                currentStatus={invoiceDetails.order_status}
-                                onPaymentStatusUpdate={invoiceDetails.payment_status}
+                                currentStatus={orderStatus}
+                                onPaymentStatusUpdate={paymentStatus}
                                 fetchSupplierOrders={fetchSupplierOrders}
+                                setPaymentStatus={setPaymentStatus}
+                                setOrderStatus={setOrderStatus}
                             />
                         </Col>
                     </Row>

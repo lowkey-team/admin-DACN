@@ -22,6 +22,8 @@ const UpdateWarehouse = ({
     currentStatus,
     onPaymentStatusUpdate,
     fetchSupplierOrders,
+    setPaymentStatus,
+    setOrderStatus,
 }) => {
     const handleUpdateStatus = async (values) => {
         const requestData = {
@@ -34,7 +36,8 @@ const UpdateWarehouse = ({
             await updateOrderSupplierAPI(requestData);
             fetchSupplierOrders();
             onCancel();
-
+            setPaymentStatus(requestData.paymentStatus);
+            setOrderStatus(requestData.orderStatus);
             notification.success({
                 message: 'Cập nhật trạng thái thành công',
             });
@@ -53,7 +56,7 @@ const UpdateWarehouse = ({
                 name="update-order-status"
                 onFinish={handleUpdateStatus}
                 initialValues={{
-                    paymentStatus: 'pending',
+                    paymentStatus: onPaymentStatusUpdate,
                     orderStatus: currentStatus || 'pending',
                 }}
             >
