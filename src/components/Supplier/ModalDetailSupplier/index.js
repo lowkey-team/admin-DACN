@@ -79,7 +79,7 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
                     }
                 } catch (error) {
                     console.error('Error deleting supplier:', error);
-                    message.error('Đã xảy ra lỗi khi xóa nhà cung cấp.');
+                    // message.error('Đã xảy ra lỗi khi xóa nhà cung cấp.');
                     onClose();
                 }
             },
