@@ -30,3 +30,18 @@
 .body {
     margin-top: 24px;
 }
+.marginTop {
+    margin-top: -20px;
+}
+.form-addProduct {
+    background-color: rgb(224, 224, 210);
+    padding: 10px;
+    border-radius: 10px;
+}
+.imported-products {
+    display: flex;
+    flex-direction: column;
+}
+.btn_Warehoues--add {
+    margin: 0 auto;
+}

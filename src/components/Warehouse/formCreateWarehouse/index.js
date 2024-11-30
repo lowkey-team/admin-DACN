@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Button, Typography, Select, Form, notification, Input, List, Table } from 'antd';
+import {
+    Layout,
+    Button,
+    Typography,
+    Select,
+    Form,
+    notification,
+    Input,
+    List,
+    Table,
+    Row,
+    Col,
+    Spin,
+    Modal,
+} from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import classNames from 'classnames/bind';
 import styles from './Warehouse.module.scss';
 import { getAllCategoryAPI } from '~/apis/category';
 import { fetchProductByIdAPI, fetchProductByIdSupCategoryAPI } from '~/apis/ProductAPI';
+import { fecthShowAllSupplierAPI } from '~/apis/supplier';
+import { addNewWarehouseAPI } from '~/apis/warehoues';
 
 const cx = classNames.bind(styles);
 
@@ -26,6 +42,9 @@ function WarehouseCreate() {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [quantity, setQuantity] = useState(0);
     const [importedProducts, setImportedProducts] = useState([]);
+
+    const [suppliers, setSupplier] = useState([]);
+    const [SelectedSupplier, setSelectedSupplier] = useState(null);
 
     useEffect(() => {
         const storedProducts = JSON.parse(localStorage.getItem('warehouseProducts')) || [];
@@ -100,6 +119,33 @@ function WarehouseCreate() {
         fetchData();
     }, [productID]);
 
+    useEffect(() => {
+        const fetchSupplier = async () => {
+            setLoading(true);
+            try {
+                const response = await fecthShowAllSupplierAPI();
+                console.log('data supplier', response);
+                if (response) {
+                    setSupplier(response);
+                } else {
+                    notification.error({
+                        message: 'Lỗi',
+                        description: 'Không thể lấy danh sách nhà cung cấp.',
+                    });
+                }
+            } catch (error) {
+                notification.error({
+                    message: 'Lỗi',
+                    description: error.message || 'Đã xảy ra lỗi khi gọi API.',
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSupplier();
+    }, []);
+
     const handleCategoryChange = (categoryId) => {
         const selectedCategory = categories.find((category) => category.category_id === categoryId);
         console.log('Danh mục được chọn:', selectedCategory);
@@ -159,7 +205,7 @@ function WarehouseCreate() {
         setImportedProducts(storedProducts);
         notification.success({
             message: 'Thành công',
-            description: 'Nhập kho thành công!',
+            description: 'Thêm sản phẩm thành công!',
         });
     };
 
@@ -186,6 +232,11 @@ function WarehouseCreate() {
         setQuantity(value);
     };
 
+    const handleSupplierChange = (value) => {
+        console.log('Supplier: id', value);
+        setSelectedSupplier(value);
+    };
+
     const handleGoBack = () => {
         window.history.back();
     };
@@ -200,9 +251,73 @@ function WarehouseCreate() {
     };
 
     const handleDeleteProduct = (record) => {
-        const updatedProducts = importedProducts.filter((product) => product.productName !== record.productName);
-        setImportedProducts(updatedProducts);
-        localStorage.setItem('warehouseProducts', JSON.stringify(updatedProducts));
+        // const updatedProducts = importedProducts.filter((product) => product.variantCode !== record.variantCode);
+        // setImportedProducts(updatedProducts);
+        // localStorage.setItem('warehouseProducts', JSON.stringify(updatedProducts));
+        Modal.confirm({
+            title: 'Xác nhận',
+            content: `Bạn có chắc muốn xóa sản phẩm ${record.productName} không?`,
+            okText: 'Xóa',
+            cancelText: 'Hủy',
+            onOk: () => {
+                const updatedProducts = importedProducts.filter(
+                    (product) => product.variantCode !== record.variantCode,
+                );
+                setImportedProducts(updatedProducts);
+                localStorage.setItem('warehouseProducts', JSON.stringify(updatedProducts));
+            },
+        });
+    };
+    const handleAddNewWarehouseProduct = async () => {
+        if (!SelectedSupplier) {
+            notification.error({
+                message: 'Lỗi',
+                description: 'Vui lòng chọn nhà cung cấp!',
+            });
+            return;
+        }
+
+        const data = SelectedSupplier;
+        const dataItem = importedProducts;
+        const user = JSON.parse(sessionStorage.getItem('user'));
+
+        console.log('data truoc khi gui data', data);
+        console.log('data truoc khi gui dataItem', dataItem);
+
+        const convertedData = {
+            supplierId: SelectedSupplier,
+            employeerId: user.id,
+            orderDate: '2024-11-28',
+            items: dataItem.map((item) => ({
+                productVariationId: item.variantCode,
+                quantityOrdered: item.quantity,
+            })),
+        };
+
+        console.log('data sau khi convert', convertedData);
+
+        try {
+            const response = await addNewWarehouseAPI(convertedData);
+            if (response.status === 201) {
+                notification.success({
+                    message: 'Thành công',
+                    description: 'Tạo phiếu nhập kho thành công!',
+                });
+
+                localStorage.removeItem('warehouseProducts');
+                setImportedProducts([]);
+            } else {
+                notification.error({
+                    message: 'Thất bại',
+                    description: 'Tạo phiếu nhập kho thất bại!',
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: 'Lỗi',
+                description: 'Đã xảy ra lỗi khi tạo phiếu nhập kho!',
+            });
+        }
     };
 
     return (
@@ -222,107 +337,153 @@ function WarehouseCreate() {
                     </div>
                 </div>
                 <div className={cx('body')}>
-                    <Form layout="vertical" className={cx('form')}>
-                        {/* Select danh mục cha */}
-                        <Form.Item
-                            label="Danh mục"
-                            name="category"
-                            rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
-                        >
-                            <Select
-                                placeholder="Chọn danh mục"
-                                loading={loading}
-                                onChange={handleCategoryChange} // Gọi khi danh mục cha thay đổi
-                            >
-                                {categories && categories.length > 0 ? (
-                                    categories.map((category) => (
-                                        <Option key={category.category_id} value={category.category_id}>
-                                            {category.category_name}
-                                        </Option>
-                                    ))
-                                ) : (
-                                    <Option disabled>Không có danh mục nào</Option>
-                                )}
-                            </Select>
-                        </Form.Item>
+                    <Form layout="vertical" className={cx('form-addProduct')}>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                {/* Select danh mục cha */}
+                                <Form.Item
+                                    label="Danh mục"
+                                    name="category"
+                                    rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
+                                >
+                                    <Select
+                                        placeholder="Chọn danh mục"
+                                        loading={loading}
+                                        onChange={handleCategoryChange} // Gọi khi danh mục thay đổi
+                                        showSearch
+                                        allowClear
+                                        filterOption={(input, option) =>
+                                            option.children.toLowerCase().includes(input.toLowerCase())
+                                        }
+                                    >
+                                        {categories && categories.length > 0 ? (
+                                            categories.map((category) => (
+                                                <Option key={category.category_id} value={category.category_id}>
+                                                    {category.category_name}
+                                                </Option>
+                                            ))
+                                        ) : (
+                                            <Option disabled>Không có danh mục nào</Option>
+                                        )}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
 
-                        {/* Select danh mục con */}
-                        <Form.Item
-                            label="Danh mục con"
-                            name="subcategory"
-                            rules={[{ required: true, message: 'Vui lòng chọn danh mục con!' }]}
-                        >
-                            <Select
-                                placeholder="Chọn danh mục con"
-                                disabled={subcategories.length === 0}
-                                onChange={handleSubcategoryChange}
-                            >
-                                {subcategories.length > 0 ? (
-                                    subcategories.map((subcategory) => (
-                                        <Option key={subcategory.id} value={subcategory.id}>
-                                            {subcategory.SupCategoryName}
-                                        </Option>
-                                    ))
-                                ) : (
-                                    <Option disabled>Không có danh mục con</Option>
-                                )}
-                            </Select>
-                        </Form.Item>
+                            <Col span={12}>
+                                {/* Select danh mục con */}
+                                <Form.Item
+                                    label="Danh mục con"
+                                    name="subcategory"
+                                    rules={[{ required: true, message: 'Vui lòng chọn danh mục con!' }]}
+                                >
+                                    <Select
+                                        placeholder="Chọn danh mục con"
+                                        disabled={subcategories.length === 0}
+                                        onChange={handleSubcategoryChange}
+                                        showSearch
+                                        allowClear
+                                        filterOption={(input, option) =>
+                                            option.children.toLowerCase().includes(input.toLowerCase())
+                                        }
+                                    >
+                                        {subcategories.length > 0 ? (
+                                            subcategories.map((subcategory) => (
+                                                <Option key={subcategory.id} value={subcategory.id}>
+                                                    {subcategory.SupCategoryName}
+                                                </Option>
+                                            ))
+                                        ) : (
+                                            <Option disabled>Không có danh mục con</Option>
+                                        )}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={16}>
+                            <Col span={24} className={cx('marginTop')}>
+                                {/* Hiển thị sản phẩm với tìm kiếm */}
+                                <Form.Item
+                                    label="Sản phẩm"
+                                    name="product"
+                                    rules={[{ required: true, message: 'Vui lòng chọn sản phẩm!' }]}
+                                >
+                                    <Select
+                                        showSearch
+                                        placeholder="Tìm sản phẩm"
+                                        filterOption={(input, option) => {
+                                            const productName = option?.children?.props?.children[1] || '';
+                                            return productName.toLowerCase().includes(input.toLowerCase());
+                                        }}
+                                        onChange={handleProductChange}
+                                        notFoundContent="Không tìm thấy sản phẩm"
+                                    >
+                                        {products.map((product) => (
+                                            <Option key={product.id} value={product.id}>
+                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <img
+                                                        src={product.IMG_URL}
+                                                        alt={product.productName}
+                                                        style={{ width: 30, height: 30, marginRight: 10 }}
+                                                    />
+                                                    {product.productName}
+                                                </div>
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
 
-                        {/* Hiển thị sản phẩm với tìm kiếm */}
-                        <Form.Item
-                            label="Sản phẩm"
-                            name="product"
-                            rules={[{ required: true, message: 'Vui lòng chọn sản phẩm!' }]}
-                        >
-                            <Select
-                                showSearch
-                                placeholder="Tìm sản phẩm"
-                                filterOption={(input, option) => {
-                                    const productName = option?.children?.props?.children[1] || '';
-                                    return productName.toLowerCase().includes(input.toLowerCase());
-                                }}
-                                onChange={handleProductChange}
-                                notFoundContent="Không tìm thấy sản phẩm"
-                            >
-                                {products.map((product) => (
-                                    <Option key={product.id} value={product.id}>
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            <img
-                                                src={product.IMG_URL}
-                                                alt={product.productName}
-                                                style={{ width: 30, height: 30, marginRight: 10 }}
-                                            />
-                                            {product.productName}
-                                        </div>
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+                            <Col span={12} className={cx('marginTop')}>
+                                {/* Hiển thị biến thể */}
+                                <Form.Item
+                                    label="Biến thể sản phẩm"
+                                    name="variant"
+                                    rules={[{ required: true, message: 'Vui lòng chọn biến thể!' }]}
+                                >
+                                    <Select placeholder="Chọn biến thể" onChange={handleVariantChange}>
+                                        {variants.map((variant) => (
+                                            <Option key={variant.id} value={variant.id}>
+                                                {` ${variant.size} -  Số lượng tồn kho: ${variant.stock}`}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
 
-                        {/* Hiển thị biến thể */}
-                        <Form.Item
-                            label="Biến thể sản phẩm"
-                            name="variant"
-                            rules={[{ required: true, message: 'Vui lòng chọn biến thể!' }]}
-                        >
-                            <Select placeholder="Chọn biến thể" onChange={handleVariantChange}>
-                                {variants.map((variant) => (
-                                    <Option key={variant.id} value={variant.id}>
-                                        {`Kích Thước: ${variant.size} -  Số lượng tồn kho: ${variant.stock}`}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-
-                        {/* Hiển thị thông tin nhập kho */}
-                        <Form.Item label="Số lượng nhập kho" name="quantity">
-                            <Input type="number" value={quantity} onChange={handleQuantityChange} min={1} />
-                        </Form.Item>
+                            {/* Hiển thị thông tin nhập kho */}
+                            <Col span={4} className={cx('marginTop')}>
+                                <Form.Item label="Số lượng nhập kho" name="quantity">
+                                    <Input type="number" value={quantity} onChange={handleQuantityChange} min={1} />
+                                </Form.Item>
+                            </Col>
+                            <Col spant={2} style={{ marginTop: 10 }}>
+                                <Button type="primary" onClick={handleImportStock}>
+                                    Thêm
+                                </Button>
+                            </Col>
+                        </Row>
                     </Form>
-                    <Button type="primary" onClick={handleImportStock}>
-                        Nhập kho
-                    </Button>
+                    <div>
+                        <Title level={5}>Chọn nhà cung cấp</Title>
+                        <Select
+                            placeholder="Chọn nhà cung cấp"
+                            style={{ width: 800 }}
+                            loading={loading}
+                            allowClear
+                            onChange={handleSupplierChange}
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.children.toLowerCase().includes(input.toLowerCase())
+                            }
+                        >
+                            {suppliers.map((supplier) => (
+                                <Option key={supplier.id} value={supplier.id}>
+                                    {supplier.SupplierName}
+                                </Option>
+                            ))}
+                        </Select>
+                        {loading && <Spin style={{ marginTop: 10 }} />}
+                    </div>
 
                     {/* Hiển thị danh sách sản phẩm nhập kho */}
                     <div className={cx('imported-products')}>
@@ -385,8 +546,15 @@ function WarehouseCreate() {
                                     ),
                                 },
                             ]}
-                            rowKey="productName"
                         />
+
+                        <Button
+                            type="primary"
+                            onClick={handleAddNewWarehouseProduct}
+                            className={cx('btn_Warehoues--add')}
+                        >
+                            Tạo hóa đơn nhập hàng
+                        </Button>
                     </div>
                 </div>
             </Content>

@@ -7,6 +7,11 @@ export const showAllOrderSupplierAPI = async () => {
     return response.data;
 };
 
+export const addNewWarehouseAPI = async (formData) => {
+    const response = await axios.post(`${API_ROOT}/v1/orderSupplier/create`, formData);
+    return response;
+};
+
 export const findByIdOrderSupplierAPI = async (id) => {
     const response = await axios.get(`${API_ROOT}/v1/orderSupplier/${id}`);
     return response.data;
