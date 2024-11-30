@@ -19,6 +19,7 @@ import style from './Layout.module.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '~/redux/userSlice';
+import images from '~/assets/images';
 
 const cx = classNames.bind(style);
 const { Header, Sider, Content } = Layout;
@@ -78,7 +79,9 @@ const App = ({ children }) => {
     return (
         <Layout className={cx('wrapper')}>
             <Sider trigger={null} collapsible collapsed={collapsed} style={{ backgroundColor: selectedColor }}>
-                <div className={cx('logo')}>Logo</div>
+                <div className={cx('logo')}>
+                    <img src={images.logo} alt='logo'/>
+                </div>
                 <Menu
                     mode="inline"
                     defaultSelectedKeys={['1']}
