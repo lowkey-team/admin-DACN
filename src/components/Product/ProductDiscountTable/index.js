@@ -38,6 +38,7 @@ export default function ProductDiscountTable({ currentRows, onVariationSelect })
                     <tr>
                         <th style={{ width: 40 }} aria-label="empty" />
                         <th style={{ width: 50 }}></th>
+                        <th style={{ width: 50 }}></th>
                         <th style={{ display: 'flex', justifyContent: 'start' }}>Tên sản phẩm</th>
                         <th>Danh mục</th>
                         <th>Danh mục con</th>

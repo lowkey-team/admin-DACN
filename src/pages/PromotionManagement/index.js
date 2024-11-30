@@ -38,9 +38,8 @@
 
             const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD HH:mm:ss");
             const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD HH:mm:ss");
-        
 
-             const formData = {
+            const formData = {
                 ID_Variation: variation.variationId, 
                 ID_Discount: selectedDiscountId,
                 StartDate: formattedStartDate,
@@ -56,9 +55,7 @@
                 console.error("Lỗi khi áp dụng giảm giá", error);
                 alert("Có lỗi xảy ra khi áp dụng giảm giá");
             }
-        
-
-            // xử lý gọi api trong này đi. tích vào là nó sét luôn
+       
         };
 
         const handleDiscountSubmit = async () => {
@@ -74,8 +71,7 @@
             const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD HH:mm:ss");
             const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD HH:mm:ss");
         
-
-             const formData = {
+            const formData = {
                 ID_Variation: selectedVariations.variation_id, 
                 ID_Discount: selectedDiscountId,
                 StartDate: formattedStartDate,
@@ -83,7 +79,7 @@
                 status: 1
             };
         
-            console.log("Dữ liệu gửi đi: ", formData);// log dữ liệu khi chọn đâu
+            console.log("Dữ liệu gửi đi: ", formData);
         
             try {
                 const response = await AddDiscountVariantAPI(formData);
@@ -163,10 +159,6 @@
         useEffect(() => {
             fetchDiscounts();
         }, []);
-
-        
-        
-        
         
 
         const filteredProducts = useMemo(() => {
