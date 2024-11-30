@@ -14,7 +14,15 @@ const statusColors = {
     paid: 'success',
 };
 
-const UpdateWarehouse = ({ visible, onCancel, onUpdateStatus, invoice_id, currentStatus, onPaymentStatusUpdate }) => {
+const UpdateWarehouse = ({
+    visible,
+    onCancel,
+    onUpdateStatus,
+    invoice_id,
+    currentStatus,
+    onPaymentStatusUpdate,
+    fetchSupplierOrders,
+}) => {
     const handleUpdateStatus = async (values) => {
         const requestData = {
             orderSupplierId: invoice_id,
@@ -24,7 +32,7 @@ const UpdateWarehouse = ({ visible, onCancel, onUpdateStatus, invoice_id, curren
         console.log('data: ', requestData);
         try {
             await updateOrderSupplierAPI(requestData);
-
+            fetchSupplierOrders();
             onCancel();
 
             notification.success({
@@ -55,14 +63,11 @@ const UpdateWarehouse = ({ visible, onCancel, onUpdateStatus, invoice_id, curren
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái thanh toán!' }]}
                 >
                     <Select>
-                        <Option value="pending">
+                        <Option value="Đang chờ thanh toán">
                             <Tag color={statusColors.pending}>Đang chờ thanh toán</Tag>
                         </Option>
-                        <Option value="paid">
+                        <Option value="Đã thanh toán">
                             <Tag color={statusColors.paid}>Đã thanh toán</Tag>
-                        </Option>
-                        <Option value="failed">
-                            <Tag color={statusColors.failed}>Thanh toán thất bại</Tag>
                         </Option>
                     </Select>
                 </Form.Item>
@@ -73,19 +78,17 @@ const UpdateWarehouse = ({ visible, onCancel, onUpdateStatus, invoice_id, curren
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái đơn hàng!' }]}
                 >
                     <Select>
-                        <Option value="pending">
+                        <Option value="Đang chờ xử lý">
                             <Tag color={statusColors.pending}>Đang chờ xử lý</Tag>
                         </Option>
-                        <Option value="processing">
-                            <Tag color={statusColors.processing}>Đang xử lý</Tag>
-                        </Option>
-                        <Option value="delivered">
+
+                        <Option value="Đã giao">
                             <Tag color={statusColors.delivered}>Đã giao</Tag>
                         </Option>
-                        <Option value="received">
+                        <Option value="Đã nhận">
                             <Tag color={statusColors.received}>Đã nhận</Tag>
                         </Option>
-                        <Option value="cancelled">
+                        <Option value="Đã hủy">
                             <Tag color={statusColors.cancelled}>Đã hủy</Tag>
                         </Option>
                     </Select>

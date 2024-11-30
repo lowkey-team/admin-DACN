@@ -18,24 +18,23 @@ export default function SupplierOrderTable() {
     const [pageSize, setPageSize] = useState(10);
     const [supplierOrders, setSupplierOrders] = useState([]);
 
-    useEffect(() => {
-        const fetchSupplierOrders = async () => {
-            try {
-                const response = await showAllOrderSupplierAPI();
-                console.log('Data Supplier:', response);
-                if (response && Array.isArray(response)) {
-                    const formattedData = mapSupplierOrdersToTable(response);
-                    setTableData(formattedData);
-                } else {
-                    console.error('Lỗi khi lấy đơn hàng nhà cung cấp:', response.message);
-                }
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu đơn hàng nhà cung cấp:', error);
-            } finally {
-                setIsLoading(false);
+    const fetchSupplierOrders = async () => {
+        try {
+            const response = await showAllOrderSupplierAPI();
+            console.log('Data Supplier:', response);
+            if (response && Array.isArray(response)) {
+                const formattedData = mapSupplierOrdersToTable(response);
+                setTableData(formattedData);
+            } else {
+                console.error('Lỗi khi lấy đơn hàng nhà cung cấp:', response.message);
             }
-        };
-
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu đơn hàng nhà cung cấp:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    useEffect(() => {
         fetchSupplierOrders();
     }, []);
 
@@ -129,6 +128,7 @@ export default function SupplierOrderTable() {
             <ModelOrderSupplierDetail
                 invoiceDetails={selectedOrderDetails}
                 open={isDialogOpen}
+                fetchSupplierOrders={fetchSupplierOrders}
                 onClose={closeOrderDetailsDialog}
             />
         </Box>

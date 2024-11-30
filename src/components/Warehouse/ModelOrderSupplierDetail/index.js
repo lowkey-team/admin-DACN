@@ -15,18 +15,19 @@ import { UpdateTotalPriceOrderSupplierAPI } from '~/apis/invoice';
 
 const cx = classNames.bind(style);
 
-function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
+function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplierOrders }) {
     const [invoiceData, setInvoiceData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const componentRef = useRef();
+    const [totalAmount, setTotalAmount] = useState(0);
 
     useEffect(() => {
         console.log('Data orderSupplierDetail (as JSON):', JSON.stringify(invoiceDetails, null, 2));
         if (open && invoiceDetails && invoiceDetails.id) {
             fetchInvoiceData();
         }
-    }, [open, invoiceDetails]);
+    }, [open, invoiceDetails, isModalVisible]);
 
     const handlePrint = () => {
         if (!invoiceDetails || !invoiceDetails.customerName || !invoiceDetails.invoice_id) {
@@ -63,6 +64,12 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
         link.click();
     };
 
+    const calculateTotalAmount = (data) => {
+        return data.reduce((total, record) => {
+            const amount = (record.ImportQuantity || 0) * (record.UnitPrice || 0);
+            return total + amount;
+        }, 0);
+    };
     const fetchInvoiceData = async () => {
         setLoading(true);
         try {
@@ -71,6 +78,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
 
             if (Array.isArray(response) && response.length > 0) {
                 setInvoiceData(response);
+                setTotalAmount(calculateTotalAmount(response));
             } else {
                 setInvoiceData([]);
                 console.error('Dữ liệu nhận được không phải mảng hoặc bị rỗng.');
@@ -181,6 +189,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
             console.log('Updated order supplier details:', response);
 
             await UpdateTotalPriceOrderSupplierAPI(invoiceDetails.id);
+            fetchSupplierOrders();
             notification.success({
                 message: 'Cập nhật chi tiết đơn hàng thành công',
             });
@@ -193,6 +202,19 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
         }
     };
 
+    const updateTotalPrice = () => {
+        const totalAmount = invoiceData.reduce((total, item) => {
+            const amount = (item.ImportQuantity || 0) * (item.UnitPrice || 0);
+            return total + amount;
+        }, 0);
+
+        // Cập nhật lại tổng tiền của đơn hàng
+        setInvoiceData((prevData) => [
+            ...prevData,
+            { TotalPrice: totalAmount }, // Cập nhật tổng tiền vào dữ liệu
+        ]);
+    };
+
     const handleQuantityChange = (e, orderDetailId) => {
         const newValue = e.target.value;
 
@@ -201,6 +223,8 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
                 item.order_detail_id === orderDetailId ? { ...item, ImportQuantity: newValue } : item,
             ),
         );
+
+        updateTotalPrice();
     };
 
     const handlePriceChange = (e, orderDetailId) => {
@@ -209,6 +233,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
         setInvoiceData((prevData) =>
             prevData.map((item) => (item.order_detail_id === orderDetailId ? { ...item, UnitPrice: newValue } : item)),
         );
+        updateTotalPrice();
     };
 
     const handleBlurAmount = (e, orderDetailId) => {
@@ -239,6 +264,16 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
     const handleUpdateStatus = () => {
         setIsModalVisible(true);
         console.log('Update status');
+    };
+
+    const updateTotalPriceInModal = () => {
+        const totalAmount = invoiceData.reduce((total, item) => {
+            const amount = (item.ImportQuantity || 0) * (item.UnitPrice || 0);
+            return total + amount;
+        }, 0);
+
+        // Cập nhật tổng tiền trong thông tin đơn hàng
+        setInvoiceData((prevData) => [...prevData, { TotalPrice: totalAmount }]);
     };
 
     return (
@@ -315,7 +350,14 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
                                             </Typography.Text>
                                             <br />
                                             <Typography.Text>
-                                                Tổng tiền: {formatCurrency(invoiceDetails.TotalPrice)}
+                                                Tổng tiền: Tổng tiền:{' '}
+                                                {formatCurrency(
+                                                    invoiceData.reduce(
+                                                        (total, item) =>
+                                                            total + (item.ImportQuantity || 0) * (item.UnitPrice || 0),
+                                                        0,
+                                                    ),
+                                                )}
                                             </Typography.Text>
 
                                             <Row justify="center" style={{ marginTop: 20 }}>
@@ -339,6 +381,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
                                 onUpdateStatus={handleUpdateStatus}
                                 currentStatus={invoiceDetails.order_status}
                                 onPaymentStatusUpdate={invoiceDetails.payment_status}
+                                fetchSupplierOrders={fetchSupplierOrders}
                             />
                         </Col>
                     </Row>
