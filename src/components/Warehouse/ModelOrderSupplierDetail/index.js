@@ -9,6 +9,7 @@ import htmlDocx from 'html-docx-js/dist/html-docx';
 import 'jspdf-autotable';
 import { formatCurrency } from '~/utils/dateUtils';
 import UpdateWarehouse from '../UpdateWarehouse.js';
+import { UpdateTotalPriceOrderSupplierAPI } from '~/apis/invoice';
 
 // import UpdateInvoice from '../UpdateInvoice.js';
 
@@ -173,11 +174,13 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose }) {
             status: updatedDetail.status || 0,
             unitPrice: updatedDetail.UnitPrice,
         };
+        console.log('Data id', invoiceDetails.id);
 
         try {
             const response = await updateOrderSupplierDetailsAPI(requestData);
             console.log('Updated order supplier details:', response);
 
+            await UpdateTotalPriceOrderSupplierAPI(invoiceDetails.id);
             notification.success({
                 message: 'Cập nhật chi tiết đơn hàng thành công',
             });
