@@ -29,6 +29,7 @@ import CustomerManagement from '~/pages/CustomerManagement';
 import Invoice from '~/pages/Invoice';
 import Login from '~/pages/Login';
 import Product from '~/pages/Product';
+import PromotionManagement from '~/pages/PromotionManagement';
 import Supplier from '~/pages/SupplierManager';
 import WarehouseManager from '~/pages/WarehouseManager';
 
@@ -42,7 +43,10 @@ const privateRoutes = [
     { path: '/customer', component: CustomerManagement },
     { path: '/invoice', component: Invoice },
     { path: '/category', component: CategoryManager },
+
     { path: '/WarehouseManager', component: WarehouseManager },
+
+    { path: '/promotion', component: PromotionManagement },
 ];
 
 export { publicRoutes, privateRoutes };
