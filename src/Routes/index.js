@@ -22,6 +22,7 @@
 import React from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { DefaultLayout } from '~/components/Layout';
+import Warehouse from '~/components/Warehouse';
 import AddMoreProduct from '~/pages/AddMoreProduct';
 import CategoryManager from '~/pages/CategoryManager';
 import CustomerManagement from '~/pages/CustomerManagement';
@@ -35,6 +36,7 @@ const publicRoutes = [{ path: '/', component: Login, layout: null }];
 
 const privateRoutes = [
     { path: '/supplier', component: Supplier },
+    { path: '/warehouse', component: Warehouse },
     { path: '/product', component: Product },
     { path: '/addmoreproduct', component: AddMoreProduct },
     { path: '/customer', component: CustomerManagement },

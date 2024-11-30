@@ -193,7 +193,7 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('18')}
                         style={{ color: textColor }}
                     >
-                        <Link to="/supplier" className={cx('text-Decoration_none')}>
+                        <Link to="/warehouse" className={cx('text-Decoration_none')}>
                             Quản lý kho
                         </Link>
                     </Menu.Item>
@@ -232,7 +232,9 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('12')}
                         style={{ color: textColor }}
                     >
-                        Giảm giá
+                        <Link to="/promotion" className={cx('text-Decoration_none')}>
+                            Giảm giá
+                        </Link>
                     </Menu.Item>
                 </Menu>
             </Sider>

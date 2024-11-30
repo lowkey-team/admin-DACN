@@ -1,43 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { DataGrid } from '@mui/x-data-grid'; // Sử dụng DataGrid từ MUI
-import {
-    Box,
-    CircularProgress,
-    Paper,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Icon,
-} from '@mui/material'; // Các component của Material-UI
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, CircularProgress, Paper, Button } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileInvoice } from '@fortawesome/free-solid-svg-icons';
 import { fecthShowAllSupplierAPI } from '~/apis/supplier';
-// import DialogInvoiceDetail from '../DialogInvoiceDetail';
+import { fetchSupplierByIdAPI } from '~/apis/supplier';  
+import ModalDetailSupplier from '../ModalDetailSupplier';
+
 
 export default function SupplierTable() {
     const [data, setData] = useState({ rows: [], columns: [] });
     const [loading, setLoading] = useState(true);
-    const [open, setOpen] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
     const [supplierDetails, setSupplierDetails] = useState(null);
     const [showDetailColumn, setShowDetailColumn] = useState(false);
-
-    const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
-    const [allData, setAllData] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fecthShowAllSupplierAPI();
-                console.log('Data Supplier:', response);
                 if (response && Array.isArray(response)) {
                     const suppliers = response;
                     const formattedData = formatSupplierData(suppliers);
                     setData(formattedData);
-                } else {
-                    console.error('Lỗi khi lấy nhà cung cấp:', response.message);
                 }
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu nhà cung cấp:', error);
@@ -49,22 +34,21 @@ export default function SupplierTable() {
         fetchData();
     }, []);
 
+
     const formatSupplierData = (suppliers) => {
         const columns = [
-            { field: 'id', headerName: 'Mã Nhà Cung Cấp', width: 50 },
-            { field: 'SupplierName', headerName: 'Tên Nhà Cung Cấp', width: 180 },
-            { field: 'address', headerName: 'Địa Chỉ', width: 180 },
-            { field: 'phoneNumber', headerName: 'Số Điện Thoại', width: 150 },
-            { field: 'Email', headerName: 'Email', width: 180 },
-            { field: 'contactPerson', headerName: 'Người Liên Hệ', width: 180 },
-            { field: 'createdAt', headerName: 'Ngày Tạo', width: 180 },
+            { field: 'id', headerName: 'Mã Số', width: 50 },
+            { field: 'SupplierName', headerName: 'Tên Nhà Cung Cấp', width: 360 },
+            { field: 'phoneNumber', headerName: 'Số Điện Thoại', width: 180 },
+            { field: 'Email', headerName: 'Email', width: 280 },
+            { field: 'contactPerson', headerName: 'Người Liên Hệ', width: 230 },
             {
                 field: 'viewDetails',
                 headerName: 'Xem Chi Tiết',
                 width: 120,
                 hide: !showDetailColumn,
                 renderCell: (params) => (
-                    <Button variant="contained" color="primary" onClick={() => handleViewDetails(params.row)}>
+                    <Button variant="contained" color="primary" onClick={() => handleViewDetails(params.row.id)}>
                         <FontAwesomeIcon icon={faFileInvoice} />
                     </Button>
                 ),
@@ -74,7 +58,6 @@ export default function SupplierTable() {
         const rows = suppliers.map((supplier) => ({
             id: supplier.id,
             SupplierName: supplier.SupplierName,
-            address: supplier.address || 'N/A',
             phoneNumber: supplier.phoneNumber || 'N/A',
             Email: supplier.Email || 'N/A',
             contactPerson: supplier.contactPerson || 'N/A',
@@ -84,23 +67,21 @@ export default function SupplierTable() {
         return { rows, columns };
     };
 
-    const handleViewDetails = (row) => {
-        console.log('Viewing details for:', row);
-        setSupplierDetails(row);
-        setOpen(true);
+    const handleViewDetails = async (id) => {
+        try {
+            const response = await fetchSupplierByIdAPI(id);
+            setSupplierDetails(response); 
+            setOpenModal(true); 
+        } catch (error) {
+            console.error('Lỗi khi lấy chi tiết nhà cung cấp:', error);
+        }
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleCloseModal = () => {
+        setOpenModal(false);
         setSupplierDetails(null);
     };
 
-    // Hàm để hiển thị cột "Xem chi tiết"
-    const handleShowDetailColumn = () => {
-        setShowDetailColumn(true);
-    };
-    // Xử lý phân trang client-side
-    const paginatedData = allData.slice(page * pageSize, page * pageSize + pageSize);
     return (
         <Box sx={{ width: '100%', height: 520 }}>
             {loading ? (
@@ -115,20 +96,15 @@ export default function SupplierTable() {
                         loading={loading}
                         disableSelectionOnClick
                         getRowId={(row) => row.id}
-                        // initialState={{
-                        //     columns: {
-                        //         columnVisibilityModel: {
-                        //             address: false,
-                        //             phoneNumber: false,
-                        //             createdAt: false,
-                        //         },
-                        //     },
-                        // }}
                     />
                 </Paper>
             )}
 
-            {/* <DialogInvoiceDetail invoiceDetails={supplierDetails} open={open} onClose={handleClose} /> */}
+            <ModalDetailSupplier 
+                open={openModal} 
+                onClose={handleCloseModal} 
+                supplierDetails={supplierDetails} 
+            />
         </Box>
     );
 }
