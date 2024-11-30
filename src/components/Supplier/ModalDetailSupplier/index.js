@@ -48,11 +48,13 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
                 } catch (error) {
                     console.error('Error updating supplier:', error);
                     // message.error('Đã xảy ra lỗi khi cập nhật nhà cung cấp.');
+                    setIsEditing(false);
                     onClose();
                 }
             },
             onCancel: () => {
                 console.log('Cập nhật bị hủy');
+                setIsEditing(false);
             },
         });
     };
@@ -77,7 +79,7 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
                     }
                 } catch (error) {
                     console.error('Error deleting supplier:', error);
-                    // message.error('Đã xảy ra lỗi khi xóa nhà cung cấp.');
+                    message.error('Đã xảy ra lỗi khi xóa nhà cung cấp.');
                     onClose();
                 }
             },
