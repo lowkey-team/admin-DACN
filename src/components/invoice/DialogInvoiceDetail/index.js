@@ -12,15 +12,26 @@ import 'jspdf-autotable';
 
 const cx = classNames.bind(style);
 
-function DialogInvoiceDetail({ invoiceDetails, open, onClose }) {
+function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
     const [invoiceData, setInvoiceData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [orderStatus, setOrderStatus] = useState('');
+    const [paymentStatus, setPaymentStatus] = useState('');
+
     const componentRef = useRef();
+
+    useEffect(() => {
+        setOrderStatus(invoiceDetails?.orderStatus);
+        setPaymentStatus(invoiceDetails?.paymentStatus);
+        // setOrderStatus('hloo');
+        // setPaymentStatus('hello');
+    }, [invoiceDetails]);
 
     useEffect(() => {
         if (open && invoiceDetails && invoiceDetails.invoice_id) {
             fetchInvoiceData();
+            fetchData();
         }
     }, [open, invoiceDetails]);
 
@@ -134,8 +145,8 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose }) {
                     <p>Điện thoại: ${invoiceDetails.customerPhone || 'N/A'}</p>
                     <p>Ngày tạo đơn hàng: ${invoiceDetails.createdAt || 'N/A'}</p>
                     <p>Ngày xuất hóa đơn: ${new Date().toLocaleDateString()}</p>
-                    <p>Trạng thái đơn hàng: ${invoiceDetails.orderStatus || 'N/A'}</p>
-                    <p>Trạng thái thanh toán: ${invoiceDetails.paymentStatus || 'N/A'}</p>
+                    <p>Trạng thái đơn hàng: ${orderStatus || 'N/A'}</p>
+                    <p>Trạng thái thanh toán: ${paymentStatus || 'N/A'}</p>
                 </div>
     
                 <table class="invoice-table">
@@ -282,7 +293,7 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose }) {
                                     </Typography.Text>
                                 </Col>
                                 <Col span={12} className={cx('col-info')}>
-                                    <Typography.Text>Trạng thái đơn hàng: {invoiceDetails.orderStatus}</Typography.Text>
+                                    <Typography.Text>Trạng thái đơn hàng: {orderStatus}</Typography.Text>
                                     <Typography.Text>Ghi chú: {invoiceDetails.note}</Typography.Text>
                                 </Col>
                             </Row>
@@ -333,17 +344,13 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose }) {
                                     <div className={cx('content-info')}>
                                         <Typography.Text>Ngày tạo: {invoiceDetails.createdAt}</Typography.Text>
                                         <br />
-                                        <Typography.Text>
-                                            Trạng thái thanh toán: {invoiceDetails.orderStatus}
-                                        </Typography.Text>
+                                        <Typography.Text>Trạng thái thanh toán: {orderStatus}</Typography.Text>
                                         <br />
                                         <Typography.Text>
                                             Hình thức thanh toán: {invoiceDetails.paymentMethod}
                                         </Typography.Text>
                                         <br />
-                                        <Typography.Text>
-                                            Trạng thái thanh toán: {invoiceDetails.paymentStatus}
-                                        </Typography.Text>
+                                        <Typography.Text>Trạng thái thanh toán: {paymentStatus}</Typography.Text>
                                     </div>
                                 </div>
                             </Col>
@@ -406,8 +413,11 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose }) {
                             visible={isModalVisible}
                             onCancel={handleCancel}
                             onUpdateStatus={handleUpdateStatus}
-                            currentStatus={invoiceDetails.orderStatus}
-                            onPaymentStatusUpdate={invoiceDetails.orderStatus}
+                            currentStatus={orderStatus}
+                            onPaymentStatusUpdate={orderStatus}
+                            setOrderStatus={setOrderStatus}
+                            fetchData={fetchData}
+                            setPaymentStatus={setPaymentStatus}
                         />
                     </Col>
 

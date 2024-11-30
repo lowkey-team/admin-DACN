@@ -23,25 +23,24 @@ export default function InvoiceTable() {
     const [invoiceDetails, setInvoiceDetails] = useState(null);
     const [showDetailColumn, setShowDetailColumn] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetchInvoiceAllAPI();
-                console.log('Data Invoice:', response); // Kiểm tra cấu trúc phản hồi API
-                if (response.data && Array.isArray(response.data)) {
-                    const invoices = response.data; // Đảm bảo dữ liệu là mảng
-                    const formattedData = formatInvoiceData(invoices);
-                    setData(formattedData);
-                } else {
-                    console.error('Lỗi khi lấy hóa đơn:', response.message);
-                }
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu hóa đơn:', error);
-            } finally {
-                setLoading(false);
+    const fetchData = async () => {
+        try {
+            const response = await fetchInvoiceAllAPI();
+            console.log('Data Invoice:', response); // Kiểm tra cấu trúc phản hồi API
+            if (response.data && Array.isArray(response.data)) {
+                const invoices = response.data; // Đảm bảo dữ liệu là mảng
+                const formattedData = formatInvoiceData(invoices);
+                setData(formattedData);
+            } else {
+                console.error('Lỗi khi lấy hóa đơn:', response.message);
             }
-        };
-
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu hóa đơn:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -139,7 +138,12 @@ export default function InvoiceTable() {
                 </Paper>
             )}
 
-            <DialogInvoiceDetail invoiceDetails={invoiceDetails} open={open} onClose={handleClose} />
+            <DialogInvoiceDetail
+                fetchData={fetchData}
+                invoiceDetails={invoiceDetails}
+                open={open}
+                onClose={handleClose}
+            />
         </Box>
     );
 }

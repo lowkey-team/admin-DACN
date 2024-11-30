@@ -16,3 +16,10 @@ export const updateInvoiceStatusAPI = async (formData) => {
     const response = await axios.put(`${API_ROOT}/v1/invoices/update`, formData);
     return response;
 };
+
+export const UpdateTotalPriceOrderSupplierAPI = async (id_OrderSupplier) => {
+    const response = await axios.put(`${API_ROOT}/v1/orderSupplier/UpdateTotal`, {
+        id: id_OrderSupplier,
+    });
+    return response;
+};

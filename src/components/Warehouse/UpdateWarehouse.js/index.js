@@ -1,33 +1,40 @@
 import React, { useState } from 'react';
 import { Modal, Form, Select, Button, notification, Tag } from 'antd';
-import { updateInvoiceStatusAPI } from '~/apis/invoice';
+import { updateOrderSupplierAPI } from '~/apis/warehoues';
 
 const { Option } = Select;
 
-const UpdateInvoice = ({
+const statusColors = {
+    pending: 'orange',
+    processing: 'blue',
+    delivered: 'green',
+    received: 'geekblue',
+    cancelled: 'red',
+    failed: 'volcano',
+    paid: 'success',
+};
+
+const UpdateWarehouse = ({
     visible,
     onCancel,
     onUpdateStatus,
     invoice_id,
     currentStatus,
     onPaymentStatusUpdate,
-    setOrderStatus,
-    fetchData,
-    setPaymentStatus,
+    fetchSupplierOrders,
 }) => {
     const handleUpdateStatus = async (values) => {
         const requestData = {
-            invoiceId: invoice_id,
-            paymentStatus: values.paymentStatus,
+            orderSupplierId: invoice_id,
             orderStatus: values.orderStatus,
+            paymentStatus: values.paymentStatus,
         };
-
+        console.log('data: ', requestData);
         try {
-            await updateInvoiceStatusAPI(requestData);
-            setOrderStatus(requestData.orderStatus);
-            setPaymentStatus(requestData.paymentStatus);
+            await updateOrderSupplierAPI(requestData);
+            fetchSupplierOrders();
             onCancel();
-            fetchData();
+
             notification.success({
                 message: 'Cập nhật trạng thái thành công',
             });
@@ -46,7 +53,7 @@ const UpdateInvoice = ({
                 name="update-order-status"
                 onFinish={handleUpdateStatus}
                 initialValues={{
-                    paymentStatus: onPaymentStatusUpdate,
+                    paymentStatus: 'pending',
                     orderStatus: currentStatus || 'pending',
                 }}
             >
@@ -57,11 +64,10 @@ const UpdateInvoice = ({
                 >
                     <Select>
                         <Option value="Đang chờ thanh toán">
-                            <Tag color="gold">Đang chờ thanh toán</Tag>
+                            <Tag color={statusColors.pending}>Đang chờ thanh toán</Tag>
                         </Option>
                         <Option value="Đã thanh toán">
-                            {' '}
-                            <Tag color="green">Đã thanh toán</Tag>
+                            <Tag color={statusColors.paid}>Đã thanh toán</Tag>
                         </Option>
                     </Select>
                 </Form.Item>
@@ -72,32 +78,18 @@ const UpdateInvoice = ({
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái đơn hàng!' }]}
                 >
                     <Select>
-                        <Option value="Chờ thanh toán">
-                            {' '}
-                            <Tag color="blue">Chờ thanh toán</Tag>
+                        <Option value="Đang chờ xử lý">
+                            <Tag color={statusColors.pending}>Đang chờ xử lý</Tag>
                         </Option>
-                        <Option value="Đang xử lý">
-                            <Tag color="lime">Đang xử lý</Tag>
+
+                        <Option value="Đã giao">
+                            <Tag color={statusColors.delivered}>Đã giao</Tag>
                         </Option>
-                        <Option value="Chờ lấy hàng">
-                            {' '}
-                            <Tag color="gold">Chờ lấy hàng</Tag>
-                        </Option>
-                        <Option value="Chờ giao hàng">
-                            {' '}
-                            <Tag color="magenta">Chờ giao hàng</Tag>
-                        </Option>
-                        <Option value="Trả hàng">
-                            {' '}
-                            <Tag color="purple">Trả hàng</Tag>
-                        </Option>
-                        <Option value="Được giao">
-                            {' '}
-                            <Tag color="green">Được giao</Tag>
+                        <Option value="Đã nhận">
+                            <Tag color={statusColors.received}>Đã nhận</Tag>
                         </Option>
                         <Option value="Đã hủy">
-                            {' '}
-                            <Tag color="red">Đã hủy</Tag>
+                            <Tag color={statusColors.cancelled}>Đã hủy</Tag>
                         </Option>
                     </Select>
                 </Form.Item>
@@ -112,4 +104,4 @@ const UpdateInvoice = ({
     );
 };
 
-export default UpdateInvoice;
+export default UpdateWarehouse;
