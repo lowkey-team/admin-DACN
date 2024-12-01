@@ -94,8 +94,11 @@ const App = ({ children }) => {
                         className={cx('custom-menu-item', { selected: selectedKey === '1' })}
                         onClick={() => handleMenuItemClick('1')}
                         style={{ color: textColor }}
+                        href="/overview"
                     >
-                        Tổng quan
+                        <Link to="/overview" className={cx('text-Decoration_none')}>
+                            Tổng quan
+                        </Link>
                     </Menu.Item>
                     <Menu.Item
                         key="2"

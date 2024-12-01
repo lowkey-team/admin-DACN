@@ -50,7 +50,7 @@ function Login() {
                 setIsModalOpen(false);
                 console.log('Đăng nhập thành công fgvhbn:', response);
 
-                navigate('/product');
+                navigate('/overview');
             }, 1000);
 
             console.log('Đăng nhập thành công:', response);
