@@ -70,10 +70,14 @@ function RolesManagementPage() {
                 </div>
 
                 <div className={cx('col-md-12')}>
-                    <Radio.Group value={selectedRoles[0]} onChange={handleRoleCheckboxChange}>
+                    <Radio.Group
+                        className={cx('form-roles')}
+                        value={selectedRoles[0]}
+                        onChange={handleRoleCheckboxChange}
+                    >
                         <Row>
                             {roles.map((role) => (
-                                <Col span={8} key={role.id}>
+                                <Col className={cx('rd-form')} key={role.id}>
                                     <Radio value={role.id}>{role.name}</Radio>
                                 </Col>
                             ))}
@@ -100,7 +104,7 @@ function RolesManagementPage() {
                                         <Row>
                                             {permissions[roleId]?.map((permission) => (
                                                 <Col span={8} key={permission.permissionId}>
-                                                    <Checkbox value={permission.permissionId}>
+                                                    <Checkbox className={cx('rd-form')} value={permission.permissionId}>
                                                         {permission.permissionName}
                                                     </Checkbox>
                                                 </Col>

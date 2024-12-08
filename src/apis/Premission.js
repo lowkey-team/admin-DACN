@@ -12,9 +12,7 @@ export const addPremissionToRoleIdAPI = async (formData) => {
     return response;
 };
 
-// export const deletePremissionByRoleId = async (formData) => {
-//     const response = await axios.delete(${API_ROOT}/v1/roles, {
-//         data: formData,
-//     });
-//     return response;
-// };
+export const deletePremissionRole = async (id) => {
+    const response = await axios.delete(`${API_ROOT}/v1/roles/${id}`);
+    return response.data;
+};

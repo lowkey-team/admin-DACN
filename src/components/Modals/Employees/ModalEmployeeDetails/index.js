@@ -62,15 +62,21 @@ function ModalEmployeeDetail({ visible, onCancel, employeeId, onRoleUpdate }) {
             try {
                 console.log('Xóa quyền:', formData);
                 await deleteRoleEmployees(formData);
+
+                // Cập nhật lại selectedRoles và employee.roles
+                setSelectedRoles((prevSelectedRoles) =>
+                    prevSelectedRoles.filter((roleName) => roleName !== formData.role_id),
+                );
+
+                // Cập nhật employee.roles để loại bỏ quyền đã xóa
+                setEmployee((prevEmployee) => ({
+                    ...prevEmployee,
+                    roles: prevEmployee.roles.filter((role) => role.idRole !== formData.role_id),
+                }));
             } catch (error) {
                 console.error(`Lỗi khi xóa quyền ${formData.role_id}:`, error);
             }
         }
-
-        const updatedRoles = employee.roles.filter(
-            (role) => !rolesToRemove.some((removeRole) => removeRole.role_id === role.idRole),
-        );
-        setEmployee({ ...employee, roles: updatedRoles });
 
         if (onRoleUpdate) onRoleUpdate();
     };
