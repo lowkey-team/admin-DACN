@@ -22,7 +22,7 @@
 import React from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { DefaultLayout } from '~/components/Layout';
-import Overview from '~/components/Overview';
+import Overview from '~/pages/Overview';
 import WarehouseCreate from '~/components/Warehouse/formCreateWarehouse';
 import AddMoreProduct from '~/pages/AddMoreProduct';
 import CategoryManager from '~/pages/CategoryManager';

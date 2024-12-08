@@ -38,7 +38,7 @@ function CustomerManagement() {
             console.log('dữ liệu khách hàng theo id: ', customerDetail);
             setIsModalVisible(true);
         } catch (error) {
-          console.log('dữ liệu khách hàng theo id: ', record);
+            console.log('dữ liệu khách hàng theo id: ', record);
             console.error('Lỗi khi lấy thông tin chi tiết khách hàng:', error);
             message.error('Không thể tải thông tin chi tiết khách hàng.');
         }

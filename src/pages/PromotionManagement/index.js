@@ -113,7 +113,7 @@
         const fetchData = async () => {
             try {
                 const data = await fetchProductAllAPI();
-                setRows(data || []); 
+                setRows(data || []);
             } catch (error) {
                 console.error("Lỗi khi tải sản phẩm:", error);
             }
@@ -159,7 +159,6 @@
         useEffect(() => {
             fetchDiscounts();
         }, []);
-        
 
         const filteredProducts = useMemo(() => {
             return rows.filter((product) => {
