@@ -13,6 +13,8 @@ export const addRolesToEmployeeAPI = async (formData) => {
 };
 
 export const deleteRoleEmployees = async (formData) => {
-    const response = await axios.delete(`${API_ROOT}/v1/RoleSystem/remove`, formData);
+    const response = await axios.delete(`${API_ROOT}/v1/RoleSystem/remove`, {
+        data: formData,
+    });
     return response;
 };

@@ -80,7 +80,7 @@ const App = ({ children }) => {
         <Layout className={cx('wrapper')}>
             <Sider trigger={null} collapsible collapsed={collapsed} style={{ backgroundColor: selectedColor }}>
                 <div className={cx('logo')}>
-                    <img src={images.logo} alt='logo'/>
+                    <img src={images.logo} alt="logo" />
                 </div>
                 <Menu
                     mode="inline"
@@ -178,7 +178,9 @@ const App = ({ children }) => {
                         onClick={() => handleMenuItemClick('7')}
                         style={{ color: textColor }}
                     >
-                        Nhân viên
+                        <Link to="/employees" className={cx('text-Decoration_none')}>
+                            Nhân viên
+                        </Link>
                     </Menu.Item>
                     <Menu.Item
                         key="17"
