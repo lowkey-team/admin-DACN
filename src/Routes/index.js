@@ -33,6 +33,7 @@ import Product from '~/pages/Product';
 import PromotionManagement from '~/pages/PromotionManagement';
 import Supplier from '~/pages/SupplierManager';
 import WarehouseManager from '~/pages/WarehouseManager';
+import EmployeesManagement from '~/pages/EmployeesManagement';
 
 const publicRoutes = [{ path: '/', component: Login, layout: null }];
 
@@ -49,6 +50,8 @@ const privateRoutes = [
     { path: '/WarehouseManager', component: WarehouseManager },
 
     { path: '/promotion', component: PromotionManagement },
+    { path: '/employees', component: EmployeesManagement },
+
 ];
 
 export { publicRoutes, privateRoutes };
