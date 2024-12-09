@@ -126,7 +126,6 @@ export default function CollapsibleTable() {
     };
 
     const canAddCategory = userPermissions.includes('Quản lý danh mục - Thêm danh mục cha');
-    console.log('ẩn nut btn thêm dah mục cha:', canAddCategory);
     const canEditCategory = userPermissions.includes('Quản lý danh mục - Sửa danh mục cha');
     const canDeleteCategory = userPermissions.includes('Quản lý danh mục - Xóa danh mục cha');
 

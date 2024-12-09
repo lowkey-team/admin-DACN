@@ -47,6 +47,7 @@ const App = ({ children }) => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+    const userPermissions = useSelector((state) => state.user.permissions);
 
     useEffect(() => {
         const fullName = sessionStorage.getItem('fullName');
@@ -75,6 +76,19 @@ const App = ({ children }) => {
         message.success('Đăng xuất thành công');
         navigate('/');
     };
+    const canViewSupportLayout = userPermissions.includes('Hỗ trợ khách hàng - Xem hỗ trợ Layout');
+    const canViewPermissionLayout = userPermissions.includes('Phân quyền - Xem phân quyền Layout');
+    const canViewCategoryLayout = userPermissions.includes('Quản lý danh mục - Xem danh mục Layout');
+    const canViewCustomerListLayout = userPermissions.includes('Quản lý khách hàng - Xem danh sách khách hàng Layout');
+    const canViewStockListLayout = userPermissions.includes('Quản lý kho - Xem danh sách nhập kho Layout');
+    const canViewEmployeeListLayout = userPermissions.includes('Quản lý nhân viên - Xem danh sách nhân viên Layout');
+    const canViewSupplierListLayout = userPermissions.includes(
+        'Quản lý nhà cung cấp - Xem danh sách nhà cung cấp Layout',
+    );
+    const canViewProductLayout = userPermissions.includes('Quản lý sản phẩm - Xem Sản phẩm Layout');
+    const canViewOrderLayout = userPermissions.includes('Quản lý đơn hàng - Xem đơn hàng Layout');
+    const canViewRolePermissionLayout = userPermissions.includes('Quản lý phân quyền - Phân quyền Layout');
+    const canViewDiscountProductLayout = userPermissions.includes('Giảm giá - Xem giảm giá Layout');
 
     return (
         <Layout className={cx('wrapper')}>
@@ -100,30 +114,36 @@ const App = ({ children }) => {
                             Tổng quan
                         </Link>
                     </Menu.Item>
-                    <Menu.Item
-                        key="2"
-                        icon={<ShoppingCartOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '2' })}
-                        onClick={() => handleMenuItemClick('2')}
-                        style={{ color: textColor }}
-                        href="/product"
-                    >
-                        <Link to="/product" className={cx('text-Decoration_none')}>
-                            Sản phẩm
-                        </Link>
-                    </Menu.Item>
 
-                    <Menu.Item
-                        key="8"
-                        icon={<UnorderedListOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '8' })}
-                        onClick={() => handleMenuItemClick('8')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/category" className={cx('text-Decoration_none')}>
-                            Danh mục
-                        </Link>
-                    </Menu.Item>
+                    {canViewProductLayout && (
+                        <Menu.Item
+                            key="2"
+                            icon={<ShoppingCartOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '2' })}
+                            onClick={() => handleMenuItemClick('2')}
+                            style={{ color: textColor }}
+                            href="/product"
+                        >
+                            <Link to="/product" className={cx('text-Decoration_none')}>
+                                Sản phẩm
+                            </Link>
+                        </Menu.Item>
+                    )}
+
+                    {canViewCategoryLayout && (
+                        <Menu.Item
+                            key="8"
+                            icon={<UnorderedListOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '8' })}
+                            onClick={() => handleMenuItemClick('8')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/category" className={cx('text-Decoration_none')}>
+                                Danh mục
+                            </Link>
+                        </Menu.Item>
+                    )}
+
                     <SubMenu
                         key="sub1"
                         icon={<UnorderedListOutlined style={{ color: textColor }} />}
@@ -131,16 +151,22 @@ const App = ({ children }) => {
                         popupStyle={{ backgroundColor: selectedColor }}
                         style={{ backgroundColor: collapsed ? selectedColor : undefined }}
                     >
-                        <Menu.Item
-                            key="3"
-                            className={cx('custom-menu-item', { selected: selectedKey === '3', collapsed: collapsed })}
-                            onClick={() => handleMenuItemClick('3')}
-                            style={{ color: collapsed ? '#000' : textColor }}
-                        >
-                            <Link to="/invoice" className={cx('text-Decoration_none')}>
-                                Đơn hàng
-                            </Link>
-                        </Menu.Item>
+                        {canViewOrderLayout && (
+                            <Menu.Item
+                                key="3"
+                                className={cx('custom-menu-item', {
+                                    selected: selectedKey === '3',
+                                    collapsed: collapsed,
+                                })}
+                                onClick={() => handleMenuItemClick('3')}
+                                style={{ color: collapsed ? '#000' : textColor }}
+                            >
+                                <Link to="/invoice" className={cx('text-Decoration_none')}>
+                                    Đơn hàng
+                                </Link>
+                            </Menu.Item>
+                        )}
+
                         <Menu.Item
                             key="4"
                             className={cx('custom-menu-item', { selected: selectedKey === '4' })}
@@ -160,51 +186,63 @@ const App = ({ children }) => {
                             Tình trạng giao
                         </Menu.Item>
                     </SubMenu>
-                    <Menu.Item
-                        key="6"
-                        icon={<UserOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '6' })}
-                        onClick={() => handleMenuItemClick('6')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/customer" className={cx('text-Decoration_none')}>
-                            Khách hàng
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item
-                        key="7"
-                        icon={<TeamOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '7' })}
-                        onClick={() => handleMenuItemClick('7')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/employees" className={cx('text-Decoration_none')}>
-                            Nhân viên
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item
-                        key="17"
-                        icon={<TeamOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '17' })}
-                        onClick={() => handleMenuItemClick('17')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/supplier" className={cx('text-Decoration_none')}>
-                            Nhà cung cấp
-                        </Link>
-                    </Menu.Item>
 
-                    <Menu.Item
-                        key="18"
-                        icon={<TeamOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '18' })}
-                        onClick={() => handleMenuItemClick('18')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/WarehouseManager" className={cx('text-Decoration_none')}>
-                            Quản lý kho
-                        </Link>
-                    </Menu.Item>
+                    {canViewCustomerListLayout && (
+                        <Menu.Item
+                            key="6"
+                            icon={<UserOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '6' })}
+                            onClick={() => handleMenuItemClick('6')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/customer" className={cx('text-Decoration_none')}>
+                                Khách hàng
+                            </Link>
+                        </Menu.Item>
+                    )}
+
+                    {canViewEmployeeListLayout && (
+                        <Menu.Item
+                            key="7"
+                            icon={<TeamOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '7' })}
+                            onClick={() => handleMenuItemClick('7')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/employees" className={cx('text-Decoration_none')}>
+                                Nhân viên
+                            </Link>
+                        </Menu.Item>
+                    )}
+
+                    {canViewSupplierListLayout && (
+                        <Menu.Item
+                            key="17"
+                            icon={<TeamOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '17' })}
+                            onClick={() => handleMenuItemClick('17')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/supplier" className={cx('text-Decoration_none')}>
+                                Nhà cung cấp
+                            </Link>
+                        </Menu.Item>
+                    )}
+
+                    {canViewStockListLayout && (
+                        <Menu.Item
+                            key="18"
+                            icon={<TeamOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '18' })}
+                            onClick={() => handleMenuItemClick('18')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/WarehouseManager" className={cx('text-Decoration_none')}>
+                                Quản lý kho
+                            </Link>
+                        </Menu.Item>
+                    )}
+
                     <Menu.Item
                         key="9"
                         icon={<PieChartOutlined />}
@@ -223,37 +261,45 @@ const App = ({ children }) => {
                     >
                         Blog
                     </Menu.Item>
-                    <Menu.Item
-                        key="11"
-                        icon={<CustomerServiceOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '11' })}
-                        onClick={() => handleMenuItemClick('11')}
-                        style={{ color: textColor }}
-                    >
-                        Hỗ trợ khách hàng
-                    </Menu.Item>
-                    <Menu.Item
-                        key="113"
-                        icon={<CustomerServiceOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '113' })}
-                        onClick={() => handleMenuItemClick('113')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/roles" className={cx('text-Decoration_none')}>
-                            Phân quyền
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item
-                        key="12"
-                        icon={<TagOutlined />}
-                        className={cx('custom-menu-item', { selected: selectedKey === '12' })}
-                        onClick={() => handleMenuItemClick('12')}
-                        style={{ color: textColor }}
-                    >
-                        <Link to="/promotion" className={cx('text-Decoration_none')}>
-                            Giảm giá
-                        </Link>
-                    </Menu.Item>
+
+                    {canViewSupportLayout && (
+                        <Menu.Item
+                            key="11"
+                            icon={<CustomerServiceOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '11' })}
+                            onClick={() => handleMenuItemClick('11')}
+                            style={{ color: textColor }}
+                        >
+                            Hỗ trợ khách hàng
+                        </Menu.Item>
+                    )}
+
+                    {canViewPermissionLayout && (
+                        <Menu.Item
+                            key="113"
+                            icon={<CustomerServiceOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '113' })}
+                            onClick={() => handleMenuItemClick('113')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/roles" className={cx('text-Decoration_none')}>
+                                Phân quyền
+                            </Link>
+                        </Menu.Item>
+                    )}
+                    {canViewDiscountProductLayout && (
+                        <Menu.Item
+                            key="12"
+                            icon={<TagOutlined />}
+                            className={cx('custom-menu-item', { selected: selectedKey === '12' })}
+                            onClick={() => handleMenuItemClick('12')}
+                            style={{ color: textColor }}
+                        >
+                            <Link to="/promotion" className={cx('text-Decoration_none')}>
+                                Giảm giá
+                            </Link>
+                        </Menu.Item>
+                    )}
                 </Menu>
             </Sider>
             <Layout>

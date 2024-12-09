@@ -15,7 +15,8 @@ import ProductEditModal from '../ProductEditModal';
 import ProductEditVariant from '../ProductEditVariants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
-import styles from './ProductRow.module.scss'
+import styles from './ProductRow.module.scss';
+import { useSelector, useDispatch } from 'react-redux';
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +25,8 @@ export default function ProductRow({ row, initialOpen = false }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [modelEdit, setModelEdit] = useState(false);
     const [modalEditVariant, setmodalEditVariant] = useState(false);
+
+    const userPermissions = useSelector((state) => state.user.permissions);
 
     const handleShowModal = () => {
         setModalVisible(true);
@@ -48,6 +51,11 @@ export default function ProductRow({ row, initialOpen = false }) {
     const handleHideModalEditVaritant = () => {
         setmodalEditVariant(false);
     };
+
+    const canProductDetail = userPermissions.includes('Quản lý sản phẩm - Xem chi tiết sản phẩm');
+    const canUpdateProduct = userPermissions.includes('Quản lý sản phẩm - Chỉnh sửa sản phẩm');
+    const canDeleteProduct = userPermissions.includes('Quản lý sản phẩm - Xóa sản phẩm');
+    const canUpdateProductVariation = userPermissions.includes('Quản lý sản phẩm - Chỉnh sửa chi tiết sản phẩm');
     return (
         <>
             <tr>
@@ -70,16 +78,23 @@ export default function ProductRow({ row, initialOpen = false }) {
                 <td>{row.subcategory_name}</td>
                 <td>{formatDateTime(row.createdAt)}</td>
                 <td>
-                    <Button color="default" variant="dashed" onClick={handleShowModal} productID={row.id}>
-                        <FontAwesomeIcon icon={faEye} style={{ color: 'blue' }}/>
-                    </Button>
+                    {canProductDetail && (
+                        <Button color="default" variant="dashed" onClick={handleShowModal} productID={row.id}>
+                            <FontAwesomeIcon icon={faEye} style={{ color: 'blue' }} />
+                        </Button>
+                    )}
 
-                    <Button color="default" variant="dashed" onClick={handleShowModalEdit} productID={row.id}>
-                        <FontAwesomeIcon icon={faPenToSquare} style={{ color: 'green' }}/>
-                    </Button>
-                    <Button color="default" variant="dashed">
-                        <FontAwesomeIcon icon={faTrash} style={{ color: 'red' }} /> 
-                    </Button>
+                    {canUpdateProduct && (
+                        <Button color="default" variant="dashed" onClick={handleShowModalEdit} productID={row.id}>
+                            <FontAwesomeIcon icon={faPenToSquare} style={{ color: 'green' }} />
+                        </Button>
+                    )}
+
+                    {canDeleteProduct && (
+                        <Button color="default" variant="dashed">
+                            <FontAwesomeIcon icon={faTrash} style={{ color: 'red' }} />
+                        </Button>
+                    )}
                 </td>
             </tr>
             <tr>
@@ -95,18 +110,18 @@ export default function ProductRow({ row, initialOpen = false }) {
                                 aria-label="product variations"
                                 sx={{
                                     '& > thead > tr > th:nth-child(n + 2), & > tbody > tr > td:nth-child(n + 3)': {
-                                        textAlign: 'right', 
+                                        textAlign: 'right',
                                     },
                                     '& > thead > tr > th:nth-child(4), & > tbody > tr > td:nth-child(4)': {
-                                        textAlign: 'left', 
+                                        textAlign: 'left',
                                     },
-                                    
+
                                     '& > tbody > tr > td:nth-child(2), & > tbody > tr > td:nth-child(3)': {
-                                        textAlign: 'right', 
+                                        textAlign: 'right',
                                     },
-                                   
+
                                     '& > tbody > tr > td:nth-child(1), & > tbody > tr > td:nth-child(4)': {
-                                        textAlign: 'left', 
+                                        textAlign: 'left',
                                     },
                                     '--TableCell-paddingX': '0.5rem',
                                 }}
@@ -134,14 +149,13 @@ export default function ProductRow({ row, initialOpen = false }) {
                                             </td>
                                         </tr>
                                     ))}
-                                    <tr >
-                                        <td style={{ textAlign: "center" }} colSpan={5}>
-                                            <Button  
-                                                type="primary" 
-                                                onClick={handleShowModalEditVariant}
-                                            >
-                                                Chỉnh sửa chi tiết sản phẩm
-                                            </Button>
+                                    <tr>
+                                        <td style={{ textAlign: 'center' }} colSpan={5}>
+                                            {canUpdateProductVariation && (
+                                                <Button type="primary" onClick={handleShowModalEditVariant}>
+                                                    Chỉnh sửa chi tiết sản phẩm
+                                                </Button>
+                                            )}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -152,7 +166,11 @@ export default function ProductRow({ row, initialOpen = false }) {
             </tr>
             <ProductDetailModal productID={row.product_id} open={modalVisible} onClose={handleHideModal} />
             <ProductEditModal productID={row.product_id} open={modelEdit} onClose={handleHideModalEdit} />
-            <ProductEditVariant productID={row.product_id}  open={modalEditVariant} onClose={handleHideModalEditVaritant} />
+            <ProductEditVariant
+                productID={row.product_id}
+                open={modalEditVariant}
+                onClose={handleHideModalEditVaritant}
+            />
         </>
     );
 }

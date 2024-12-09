@@ -97,6 +97,7 @@ export default function TableCollapsibleRow() {
     const canAddProductExcel = userPermissions.includes('Quản lý sản phẩm - Nhập sản phẩm từ excel');
     const canAddProduct = userPermissions.includes('Quản lý sản phẩm - Thêm 1 sản phẩm');
     const canExportExcel = userPermissions.includes('Quản lý sản phẩm - Xuất file excel');
+    const canAddProducts = userPermissions.includes('Quản lý sản phẩm - Thêm nhiều sản phẩm');
 
     return (
         <>
@@ -105,44 +106,55 @@ export default function TableCollapsibleRow() {
                     <p className={cx('Title')}>Danh sách sản phẩm</p>
                 </Col>
                 <div className={cx('action-btn')}>
-                    <Col span={3}>
-                        <Button icon={<FontAwesomeIcon icon={faFileExcel} />} onClick={handleFileImport}>
-                            Nhập từ Excel
-                        </Button>
-                    </Col>
+                    {canAddProductExcel && (
+                        <Col span={3}>
+                            <Button icon={<FontAwesomeIcon icon={faFileExcel} />} onClick={handleFileImport}>
+                                Nhập từ Excel
+                            </Button>
+                        </Col>
+                    )}
 
                     <ExcelImportModal
                         isModalVisible={isModalVisible}
                         handleOk={handleModalOk}
                         handleCancel={handleModalCancel}
                     />
-                    <Col span={3} className={cx('btn-create')}>
-                        <Button
-                            className={cx('btn-ExportToExcel')}
-                            icon={<FontAwesomeIcon icon={faFileExcel} />}
-                            onClick={() => exportToExcel(currentRows)}
-                        >
-                            Xuất ra excel
-                        </Button>
-                    </Col>
-                    <Col span={4} className={cx('btn-create')}>
-                        <Button
-                            icon={<FontAwesomeIcon icon={faPlus} />}
-                            onClick={showModal}
-                            style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
-                        >
-                            Thêm 1 sản phẩm
-                        </Button>
-                    </Col>
-                    <Col span={4} className={cx('btn-create')}>
-                        <Button
-                            icon={<FontAwesomeIcon icon={faPlus} />}
-                            onClick={handleAddMore}
-                            style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
-                        >
-                            Thêm nhiều sản phẩm
-                        </Button>
-                    </Col>
+
+                    {canExportExcel && (
+                        <Col span={3} className={cx('btn-create')}>
+                            <Button
+                                className={cx('btn-ExportToExcel')}
+                                icon={<FontAwesomeIcon icon={faFileExcel} />}
+                                onClick={() => exportToExcel(currentRows)}
+                            >
+                                Xuất ra excel
+                            </Button>
+                        </Col>
+                    )}
+
+                    {canAddProduct && (
+                        <Col span={4} className={cx('btn-create')}>
+                            <Button
+                                icon={<FontAwesomeIcon icon={faPlus} />}
+                                onClick={showModal}
+                                style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
+                            >
+                                Thêm 1 sản phẩm
+                            </Button>
+                        </Col>
+                    )}
+
+                    {canAddProducts && (
+                        <Col span={4} className={cx('btn-create')}>
+                            <Button
+                                icon={<FontAwesomeIcon icon={faPlus} />}
+                                onClick={handleAddMore}
+                                style={{ backgroundColor: '#28a745', borderColor: '#097B0D', color: '#ffffff' }}
+                            >
+                                Thêm nhiều sản phẩm
+                            </Button>
+                        </Col>
+                    )}
                 </div>
             </AntRow>
 
