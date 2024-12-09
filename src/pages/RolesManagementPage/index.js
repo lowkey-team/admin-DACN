@@ -26,40 +26,61 @@ function RolesManagementPage() {
         loadRoles();
     }, []);
 
+    // Hàm phân nhóm quyền theo tên trước dấu "-"
+    const groupPermissions = (permissionsData) => {
+        const grouped = {};
+
+        permissionsData.forEach((permission) => {
+            const groupName = permission.permissionName.split(' - ')[0]; // Lấy phần trước dấu "-"
+            if (!grouped[groupName]) {
+                grouped[groupName] = [];
+            }
+            grouped[groupName].push(permission);
+        });
+
+        return grouped;
+    };
+
     const handleRoleCheckboxChange = async (e) => {
         const roleId = e.target.value;
         setSelectedRoles([roleId]);
 
-        const updatedPermissions = {};
         const permissionsData = await fetchPremisstionByRoleIdAPI(roleId);
-        updatedPermissions[roleId] = permissionsData;
-        setPermissions(updatedPermissions);
+        const groupedPermissions = groupPermissions(permissionsData); // Phân nhóm quyền
+        setPermissions({
+            ...permissions,
+            [roleId]: groupedPermissions,
+        });
     };
 
-    const handlePermissionCheckboxChange = async (roleId, checkedValues) => {
+    const handlePermissionCheckboxChange = async (roleId, groupName, checkedValues) => {
         const updatedPermissions = { ...permissions };
 
-        updatedPermissions[roleId] = updatedPermissions[roleId].map((permission) => ({
+        // Chỉ cập nhật quyền trong nhóm hiện tại, không ảnh hưởng đến các nhóm khác
+        updatedPermissions[roleId][groupName] = updatedPermissions[roleId][groupName].map((permission) => ({
             ...permission,
             hasPermission: checkedValues.includes(permission.permissionId) ? 1 : 0,
         }));
+
         setPermissions(updatedPermissions);
 
-        // Tìm những permission bị bỏ chọn
-        const removedPermissionIds = updatedPermissions[roleId]
-            .filter((permission) => permission.hasPermission === 0 && !checkedValues.includes(permission.permissionId))
-            .map((permission) => permission.permissionId);
+        const removedPermissionIds = [];
+        updatedPermissions[roleId][groupName].forEach((permission) => {
+            if (permission.hasPermission === 0 && !checkedValues.includes(permission.permissionId)) {
+                removedPermissionIds.push(permission.permissionId);
+            }
+        });
 
-        // Gọi API thêm quyền mới
         for (const permissionId of checkedValues) {
-            const permission = updatedPermissions[roleId].find((perm) => perm.permissionId === permissionId);
+            const permission = updatedPermissions[roleId][groupName].find((perm) => perm.permissionId === permissionId);
+
             if (permission && permission.hasPermission === 1) {
                 const formData = {
                     role_id: roleId,
                     permission_id: permissionId,
                 };
                 try {
-                    await addPremissionToRoleIdAPI(formData);
+                    await addPremissionToRoleIdAPI(formData); // Thêm quyền vào vai trò
                     console.log(`Thêm permission ${permission.permissionName} vào role ${roleId}`);
                 } catch (error) {
                     console.error(`Lỗi khi thêm permission ${permission.permissionName}:`, error);
@@ -112,24 +133,33 @@ function RolesManagementPage() {
                             <div key={roleId} className={cx('row', 'mt-4')}>
                                 <div className={cx('col-md-12')}>
                                     <h4>Chức năng của quyền: {roles.find((role) => role.id === roleId)?.name}</h4>
-                                    <Checkbox.Group
-                                        value={permissions[roleId]
-                                            ?.filter((permission) => permission.hasPermission === 1)
-                                            .map((permission) => permission.permissionId)}
-                                        onChange={(checkedValues) =>
-                                            handlePermissionCheckboxChange(roleId, checkedValues)
-                                        }
-                                    >
-                                        <Row>
-                                            {permissions[roleId]?.map((permission) => (
-                                                <Col span={8} key={permission.permissionId}>
-                                                    <Checkbox className={cx('rd-form')} value={permission.permissionId}>
-                                                        {permission.permissionName}
-                                                    </Checkbox>
-                                                </Col>
-                                            ))}
-                                        </Row>
-                                    </Checkbox.Group>
+                                    {permissions[roleId] &&
+                                        Object.keys(permissions[roleId]).map((groupName) => (
+                                            <div key={groupName} className={cx('mt-3')}>
+                                                <h5>{groupName}</h5>
+                                                <Checkbox.Group
+                                                    value={permissions[roleId][groupName]
+                                                        ?.filter((permission) => permission.hasPermission === 1)
+                                                        .map((permission) => permission.permissionId)}
+                                                    onChange={(checkedValues) =>
+                                                        handlePermissionCheckboxChange(roleId, groupName, checkedValues)
+                                                    }
+                                                >
+                                                    <Row>
+                                                        {permissions[roleId][groupName]?.map((permission) => (
+                                                            <Col span={8} key={permission.permissionId}>
+                                                                <Checkbox
+                                                                    className={cx('rd-form')}
+                                                                    value={permission.permissionId}
+                                                                >
+                                                                    {permission.permissionName}
+                                                                </Checkbox>
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
+                                                </Checkbox.Group>
+                                            </div>
+                                        ))}
                                 </div>
                             </div>
                         ))}
