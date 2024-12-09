@@ -35,6 +35,7 @@ function Overview() {
     const [orderCount, setOrderCount] = useState(null);
     const [newCustomerCount, setNewCustomerCount] = useState(null);
     const [revenueTotal, setRevenueTotal] = useState(null);
+    const [revenueData, setRevenueData] = useState([]);
 
     useEffect(() => {
         const fetchProductCount = async () => {
@@ -97,19 +98,23 @@ function Overview() {
             <div className={cx('content')}>
                 <div className={cx('overview-cards')}>
                     <div className={cx('card', 'products')}>
-                        <h3>Tổng Sản phẩm trong cửa hàng của bạn</h3>
+                        <h3>Tổng Sản phẩm trong</h3>
+                        <h3>cửa hàng của bạn</h3>
                         <p>{productCount !== null ? productCount : 0}</p>
                     </div>
                     <div className={cx('card', 'orders')}>
-                        <h3>Tổng đơn hàng mới nhất hôm nay</h3>
+                        <h3>Tổng đơn hàng </h3>
+                        <h3>mới nhất hôm nay</h3>
                         <p>{orderCount !== null ? orderCount : 0}</p>
                     </div>
                     <div className={cx('card', 'customers')}>
-                        <h3>Tổng hách hàng mới trong 7 ngày qua</h3>
+                        <h3>Tổng hách hàng mới </h3>
+                        <h3>trong 7 ngày qua</h3>
                         <p>{newCustomerCount !== null ? newCustomerCount : 'Đang tải...'}</p>
                     </div>
                     <div className={cx('card', 'revenue')}>
-                        <h3>Tổng doanh thu từ trước đến nay</h3>
+                        <h3>Tổng doanh thu</h3>
+                        <h3>từ trước đến nay</h3>
                         <p>{formatRevenue} VNĐ</p>
                     </div>
                 </div>

@@ -1,0 +1,19 @@
+.header-page{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .btn-addEmpl{
+        border: 1px solid #333;
+        background-color: #16ff77;
+        padding: 5px 10px;
+        border-radius: 10px;
+        font-weight: 500;
+
+        &:hover{
+            background-color: #009c41;
+            color: #fff;
+            border: 1px #fff;
+        }
+    }
+}
