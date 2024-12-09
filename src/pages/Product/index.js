@@ -12,6 +12,7 @@ import ProductFormModal from '~/components/Product/ProductFormModal';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import ExcelImportModal from '~/components/Product/ExcelImportModal';
+import { useSelector, useDispatch } from 'react-redux';
 
 const cx = classNames.bind(style);
 
@@ -29,6 +30,8 @@ export default function TableCollapsibleRow() {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const navigate = useNavigate();
+
+    const userPermissions = useSelector((state) => state.user.permissions);
 
     const handleFileImport = () => {
         setIsModalVisible(true);
@@ -91,6 +94,10 @@ export default function TableCollapsibleRow() {
         navigate('/addmoreproduct');
     };
 
+    const canAddProductExcel = userPermissions.includes('Quản lý sản phẩm - Nhập sản phẩm từ excel');
+    const canAddProduct = userPermissions.includes('Quản lý sản phẩm - Thêm 1 sản phẩm');
+    const canExportExcel = userPermissions.includes('Quản lý sản phẩm - Xuất file excel');
+
     return (
         <>
             <AntRow>
@@ -139,7 +146,7 @@ export default function TableCollapsibleRow() {
                 </div>
             </AntRow>
 
-           <ProductFilters
+            <ProductFilters
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 categories={categories}
@@ -158,7 +165,7 @@ export default function TableCollapsibleRow() {
                 pageSize={rowsPerPage}
                 onChange={(page) => setCurrentPage(page)}
                 style={{ marginTop: '16px', textAlign: 'right' }}
-            /> 
+            />
             <ProductFormModal open={isModalOpen} onClose={hideModal} />
         </>
     );
