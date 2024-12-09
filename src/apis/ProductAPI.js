@@ -92,3 +92,7 @@ export const fetchProductBySubAdminAPI = async (id) => {
 
     return response.data;
 };
+export const deleteProductByID = async (id) => {
+    const response = await axios.delete(`${API_ROOT}/v1/product/deleted/${id}`);
+    return response;
+};
