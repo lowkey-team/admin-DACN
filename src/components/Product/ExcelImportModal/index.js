@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Upload, Button, message } from 'antd';
+import { Modal, Upload, Button, message, Typography } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import * as XLSX from 'xlsx';
@@ -7,12 +7,15 @@ import { importProductAPI } from '~/apis/ProductAPI';
 
 const ExcelImportModal = ({ isModalVisible, handleOk, handleCancel }) => {
     const [file, setFile] = useState(null);
-
+    const [fileName, setFileName] = useState('');
     const handleFileChange = (info) => {
         if (info.fileList.length > 0) {
-            setFile(info.fileList[0].originFileObj);
+            const selectedFile = info.fileList[0].originFileObj;
+            setFile(selectedFile);
+            setFileName(selectedFile.name);
         } else {
             setFile(null);
+            setFileName('');
         }
     };
 
@@ -48,7 +51,8 @@ const ExcelImportModal = ({ isModalVisible, handleOk, handleCancel }) => {
             console.log('du lieu import excel', formattedData);
             try {
                 const response = await importProductAPI(formattedData);
-                if (response.success) {
+                console.log('response excel', response);
+                if (response) {
                     message.success('Nhập dữ liệu thành công!');
                     handleOk();
                 } else {
@@ -77,6 +81,11 @@ const ExcelImportModal = ({ isModalVisible, handleOk, handleCancel }) => {
                     Chọn file
                 </Button>
             </Upload>
+            {fileName && (
+                <Typography.Text style={{ display: 'block', marginTop: 10, textAlign: 'center' }}>
+                    Đã chọn: {fileName}
+                </Typography.Text>
+            )}
         </Modal>
     );
 };
