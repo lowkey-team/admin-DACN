@@ -213,11 +213,11 @@
                         </div>
                     </div>
 
-                    <div className={cx('col-md-2', 'right-action')}>
+                    {/* <div className={cx('col-md-2', 'right-action')}>
                         <div className={cx('btn-confirm')}>
                             <button onClick={handleDiscountSubmit}>Xác nhận</button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className={cx('row','row-filter')}>
