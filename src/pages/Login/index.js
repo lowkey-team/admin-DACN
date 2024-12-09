@@ -24,6 +24,7 @@ function Login() {
 
         try {
             const response = await loginAdminAPI({ phone, password });
+            console.log('token trong này', response.token);
             setIsModalOpen(true);
             sessionStorage.setItem(
                 'user',

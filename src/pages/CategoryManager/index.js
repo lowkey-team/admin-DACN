@@ -20,7 +20,7 @@ const cx = classNames.bind(style);
 export default function CollapsibleTable() {
     const [categories, setCategories] = useState([]);
     const userPermissions = useSelector((state) => state.user.permissions);
-    
+    console.log('tenquyeen', userPermissions);
     const fetchCategories = async () => {
         try {
             const response = await getAllCategoryAPI();
@@ -125,9 +125,10 @@ export default function CollapsibleTable() {
         }
     };
 
-    const canAddCategory = userPermissions.includes('CREATE_CATEGORY');
-    const canEditCategory = userPermissions.includes('UPDATE_CATEGORY');
-    const canDeleteCategory = userPermissions.includes('DELETE_CATEGORY');
+    const canAddCategory = userPermissions.includes('Quản lý danh mục - Thêm danh mục cha');
+    console.log('ẩn nut btn thêm dah mục cha:', canAddCategory);
+    const canEditCategory = userPermissions.includes('Quản lý danh mục - Sửa danh mục cha');
+    const canDeleteCategory = userPermissions.includes('Quản lý danh mục - Xóa danh mục cha');
 
     return (
         <TableContainer component={Paper}>
