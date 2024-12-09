@@ -3,22 +3,17 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, ArcElement, Tooltip, Legend } from 'chart.js';
 import styles from './Overview.module.scss';
 import { useEffect, useState } from 'react';
-import { countAllOrdersTodayAPI, countAllProductAPI, countNewCustomerAPI, totalRevenueAPI } from '~/apis/Dashboard';
+import {
+    countAllOrdersTodayAPI,
+    countAllProductAPI,
+    countNewCustomerAPI,
+    monthlyRevenueAPI,
+    totalRevenueAPI,
+} from '~/apis/Dashboard';
 
 const cx = classNames.bind(styles);
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, ArcElement, Tooltip, Legend);
-
-const barChartData = {
-    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5'],
-    datasets: [
-        {
-            label: 'Doanh thu (triệu VND)',
-            data: [50, 70, 60, 90, 100],
-            backgroundColor: '#4caf50',
-        },
-    ],
-};
 
 const pieChartData = {
     labels: ['Sản phẩm A', 'Sản phẩm B', 'Sản phẩm C'],
@@ -35,7 +30,7 @@ function Overview() {
     const [orderCount, setOrderCount] = useState(null);
     const [newCustomerCount, setNewCustomerCount] = useState(null);
     const [revenueTotal, setRevenueTotal] = useState(null);
-    const [revenueData, setRevenueData] = useState([]);
+    const [monthlyRevenue, setMonthlyRevenue] = useState([]);
 
     useEffect(() => {
         const fetchProductCount = async () => {
@@ -87,7 +82,34 @@ function Overview() {
         fetchTotalRevenue();
     }, []);
 
+    useEffect(() => {
+        const fetchMonthlyRevenue = async () => {
+            try {
+                const data = await monthlyRevenueAPI();
+                console.log('Dữ liệu doanh thu biểu đồ cột:', data);
+                setMonthlyRevenue(data.monthlyRevenue);
+            } catch (error) {
+                console.error('Lỗi tải dữ liệu doanh thu theo tháng:', error);
+            }
+        };
+        fetchMonthlyRevenue();
+    }, []);
+
     const formatRevenue = revenueTotal !== null ? new Intl.NumberFormat('de-DE').format(parseFloat(revenueTotal)) : 0;
+
+    const barChartData = {
+        labels: monthlyRevenue.map((item) => {
+            const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 12'];
+            return monthNames[item.month - 1] || `Tháng ${item.month}`;
+        }),
+        datasets: [
+            {
+                label: 'Doanh thu (VNĐ)',
+                data: monthlyRevenue.map((item) => parseFloat(item.totalRevenue)),
+                backgroundColor: '#4caf50',
+            },
+        ],
+    };
 
     return (
         <div className={cx('wrapper')}>
