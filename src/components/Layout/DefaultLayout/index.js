@@ -232,7 +232,17 @@ const App = ({ children }) => {
                     >
                         Hỗ trợ khách hàng
                     </Menu.Item>
-
+                    <Menu.Item
+                        key="113"
+                        icon={<CustomerServiceOutlined />}
+                        className={cx('custom-menu-item', { selected: selectedKey === '113' })}
+                        onClick={() => handleMenuItemClick('113')}
+                        style={{ color: textColor }}
+                    >
+                        <Link to="/roles" className={cx('text-Decoration_none')}>
+                            Phân quyền
+                        </Link>
+                    </Menu.Item>
                     <Menu.Item
                         key="12"
                         icon={<TagOutlined />}

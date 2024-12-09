@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Checkbox, Row, Col, Radio } from 'antd';
 import { fetchAllRolesAPI } from '~/apis/Roles';
 import { fetchPremisstionByRoleIdAPI } from '~/apis/Premission';
-import { addPremissionToRoleIdAPI } from '~/apis/Premission'; // Import API
+import { addPremissionToRoleIdAPI, deletePremissionRole } from '~/apis/Premission'; // Import API
 
 const cx = classNames.bind(styles);
 
@@ -45,6 +45,12 @@ function RolesManagementPage() {
         }));
         setPermissions(updatedPermissions);
 
+        // Tìm những permission bị bỏ chọn
+        const removedPermissionIds = updatedPermissions[roleId]
+            .filter((permission) => permission.hasPermission === 0 && !checkedValues.includes(permission.permissionId))
+            .map((permission) => permission.permissionId);
+
+        // Gọi API thêm quyền mới
         for (const permissionId of checkedValues) {
             const permission = updatedPermissions[roleId].find((perm) => perm.permissionId === permissionId);
             if (permission && permission.hasPermission === 1) {
@@ -58,6 +64,19 @@ function RolesManagementPage() {
                 } catch (error) {
                     console.error(`Lỗi khi thêm permission ${permission.permissionName}:`, error);
                 }
+            }
+        }
+
+        for (const permissionId of removedPermissionIds) {
+            const formData = {
+                role_id: roleId,
+                permission_id: permissionId,
+            };
+            try {
+                await deletePremissionRole(roleId, permissionId);
+                console.log(`Xóa permission ${permissionId} khỏi role ${roleId}`);
+            } catch (error) {
+                console.error(`Lỗi khi xóa permission ${permissionId}:`, error);
             }
         }
     };

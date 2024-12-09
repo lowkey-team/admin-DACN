@@ -12,7 +12,9 @@ export const addPremissionToRoleIdAPI = async (formData) => {
     return response;
 };
 
-export const deletePremissionRole = async (id) => {
-    const response = await axios.delete(`${API_ROOT}/v1/roles/${id}`);
+export const deletePremissionRole = async (roleId, permissionId) => {
+    const response = await axios.delete(`${API_ROOT}/v1/roles/DeleteRolesPermission`, {
+        data: { role_id: roleId, permission_id: permissionId },
+    });
     return response.data;
 };
