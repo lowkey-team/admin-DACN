@@ -18,11 +18,17 @@ import { Add } from '@mui/icons-material';
 
 import classNames from 'classnames/bind';
 import style from './category.module.scss';
+import { useSelector } from 'react-redux';
 
 const cx = classNames.bind(style);
 
 function Row({ row, onAddSubcategory, onEditCategory, onDeleteCategory, onEditSubCategory, onDeleteSubCategory }) {
     const [open, setOpen] = useState(false);
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canEditCategory = userPermissions.includes('Quản lý danh mục - Sửa danh mục cha');
+    const canDeleteCategory = userPermissions.includes('Quản lý danh mục - Xóa danh mục cha');
+    const canAddSubCategory = userPermissions.includes('Quản lý danh mục - Thêm danh mục con');
 
     return (
         <React.Fragment>
@@ -38,32 +44,39 @@ function Row({ row, onAddSubcategory, onEditCategory, onDeleteCategory, onEditSu
                     {row.category_name}
                 </TableCell>
                 <TableCell align="right" className={cx('box-row')}>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        startIcon={<Add />}
-                        onClick={() => onAddSubcategory(row.category_id)} // Sử dụng id khi thêm danh mục con
-                    >
-                        Thêm con
-                    </Button>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        startIcon={<Edit />}
-                        onClick={() => onEditCategory(row.category_id, row.category_name)} // Sử dụng id khi sửa
-                    >
-                        Sửa
-                    </Button>
+                    {canAddSubCategory && (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            startIcon={<Add />}
+                            onClick={() => onAddSubcategory(row.category_id)} // Sử dụng id khi thêm danh mục con
+                        >
+                            Thêm con
+                        </Button>
+                    )}
 
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        startIcon={<Delete />}
-                        onClick={() => onDeleteCategory(row.category_id)} // Sử dụng id khi xóa
-                    >
-                        Xóa
-                    </Button>
+                    {canEditCategory && (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            startIcon={<Edit />}
+                            onClick={() => onEditCategory(row.category_id, row.category_name)} // Sử dụng id khi sửa
+                        >
+                            Sửa
+                        </Button>
+                    )}
+
+                    {canDeleteCategory && (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            color="error"
+                            startIcon={<Delete />}
+                            onClick={() => onDeleteCategory(row.category_id)} // Sử dụng id khi xóa
+                        >
+                            Xóa
+                        </Button>
+                    )}
                 </TableCell>
             </TableRow>
             <TableRow>
@@ -78,8 +91,6 @@ function Row({ row, onAddSubcategory, onEditCategory, onDeleteCategory, onEditSu
                                     <TableRow>
                                         <TableCell>ID</TableCell> {/* Cột ID danh mục con */}
                                         <TableCell>Tên danh mục con</TableCell>
-                                        <TableCell align="right">Sửa</TableCell>
-                                        <TableCell align="right">Xóa</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

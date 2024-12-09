@@ -7,13 +7,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ModalDetailCustomer from '~/components/Modals/ModalDetailCustomer';
 import styles from './CustomerManagement.module.scss';
 import { fecthShowAllCustomerAPI, fetchCustomerByIdAPI } from '~/apis/Customer';
+import { useSelector } from 'react-redux';
 
 const cx = classNames.bind(styles);
 
 function CustomerManagement() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [customers, setCustomers] = useState([]); // State chứa dữ liệu khách hàng
+    const [customers, setCustomers] = useState([]);
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canBlockAccountCustomer = userPermissions.includes('Quản lý khách hàng - Khóa tài khoản khách hàng');
+    const canViewDetailCustomer = userPermissions.includes(
+        'Quản lý khách hàng - Xem danh sách đơn hàng của khách hàng',
+    );
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -112,13 +119,17 @@ function CustomerManagement() {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <button className={cx('btn-viewDetail')} onClick={() => handleViewDetail(record)}>
-                        <FontAwesomeIcon icon={faEye} /> Chi tiết
-                    </button>
-                    <button className={cx('btn-lock')}>
-                        <FontAwesomeIcon icon={record.isDelete === 1 ? faUnlock : faLock} />
-                        {record.isDelete === 1 ? ' Mở Khóa' : ' Khóa'}
-                    </button>
+                    {canViewDetailCustomer && (
+                        <button className={cx('btn-viewDetail')} onClick={() => handleViewDetail(record)}>
+                            <FontAwesomeIcon icon={faEye} /> Chi tiết
+                        </button>
+                    )}
+                    {canBlockAccountCustomer && (
+                        <button className={cx('btn-lock')}>
+                            <FontAwesomeIcon icon={record.isDelete === 1 ? faUnlock : faLock} />
+                            {record.isDelete === 1 ? ' Mở Khóa' : ' Khóa'}
+                        </button>
+                    )}
                 </Space>
             ),
         },
