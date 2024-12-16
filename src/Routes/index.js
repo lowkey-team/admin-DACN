@@ -35,6 +35,7 @@ import Supplier from '~/pages/SupplierManager';
 import WarehouseManager from '~/pages/WarehouseManager';
 import EmployeesManagement from '~/pages/EmployeesManagement';
 import RolesManagementPage from '~/pages/RolesManagementPage';
+import VoucherManagement from '~/pages/VoucherManagement';
 
 const publicRoutes = [{ path: '/', component: Login, layout: null }];
 
@@ -53,6 +54,7 @@ const privateRoutes = [
     { path: '/promotion', component: PromotionManagement },
     { path: '/employees', component: EmployeesManagement },
     { path: '/roles', component: RolesManagementPage },
+    { path: '/vouchers', component: VoucherManagement },
 
 ];
 
