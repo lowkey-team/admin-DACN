@@ -21,3 +21,8 @@ export const totalRevenueAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/dashboard/revenue`);
     return response.data;
 };
+
+export const monthlyRevenueAPI = async () => {
+    const response = await axios.get(`${API_ROOT}/v1/dashboard/monthlyrevenue`);
+    return response.data;
+};
