@@ -7,7 +7,7 @@ import Sheet from '@mui/joy/Sheet';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { formatDateTime } from '~/utils/dateUtils';
-import { Button } from 'antd';
+import { Button, Modal, message } from 'antd';
 import classNames from 'classnames/bind';
 
 import ProductDetailModal from '../ProductDetailModal';
@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import styles from './ProductRow.module.scss';
 import { useSelector, useDispatch } from 'react-redux';
+import { deleteProductByID } from '~/apis/ProductAPI';
 
 const cx = classNames.bind(styles);
 
@@ -25,8 +26,17 @@ export default function ProductRow({ row, initialOpen = false }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [modelEdit, setModelEdit] = useState(false);
     const [modalEditVariant, setmodalEditVariant] = useState(false);
+    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
 
     const userPermissions = useSelector((state) => state.user.permissions);
+
+    const showDeleteConfirmModal = () => {
+        setConfirmDeleteVisible(true);
+    };
+
+    const hideDeleteConfirmModal = () => {
+        setConfirmDeleteVisible(false);
+    };
 
     const handleShowModal = () => {
         setModalVisible(true);
@@ -50,6 +60,22 @@ export default function ProductRow({ row, initialOpen = false }) {
 
     const handleHideModalEditVaritant = () => {
         setmodalEditVariant(false);
+    };
+
+    const handleDeleteProductByID = async () => {
+        try {
+            const response = await deleteProductByID(row.product_id);
+            if (response) {
+                message.success('Sản phẩm đã được xóa thành công!');
+            } else {
+                message.error('Không thể xóa sản phẩm!');
+            }
+            setConfirmDeleteVisible(false);
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            message.error('Đã xảy ra lỗi khi xóa sản phẩm!');
+            setConfirmDeleteVisible(false);
+        }
     };
 
     const canProductDetail = userPermissions.includes('Quản lý sản phẩm - Xem chi tiết sản phẩm');
@@ -91,9 +117,26 @@ export default function ProductRow({ row, initialOpen = false }) {
                     )}
 
                     {canDeleteProduct && (
-                        <Button color="default" variant="dashed">
-                            <FontAwesomeIcon icon={faTrash} style={{ color: 'red' }} />
-                        </Button>
+                        <>
+                            <Button
+                                color="default"
+                                variant="dashed"
+                                onClick={showDeleteConfirmModal}
+                                productID={row.id}
+                            >
+                                <FontAwesomeIcon icon={faTrash} style={{ color: 'red' }} />
+                            </Button>
+                            <Modal
+                                title="Xác nhận xóa"
+                                open={confirmDeleteVisible}
+                                onOk={handleDeleteProductByID}
+                                onCancel={hideDeleteConfirmModal}
+                                okText="Xóa"
+                                cancelText="Hủy"
+                            >
+                                <p>Bạn có chắc chắn muốn xóa sản phẩm này không?</p>
+                            </Modal>
+                        </>
                     )}
                 </td>
             </tr>
@@ -141,7 +184,7 @@ export default function ProductRow({ row, initialOpen = false }) {
                                             <td>{variation.size || 'N/A'}</td>
                                             <td>{variation.price ? variation.price.toLocaleString() : 'N/A'}</td>
                                             <td>{variation.stock !== null ? variation.stock : 'N/A'}</td>
-                                            <td>{variation.isDelete === 1 ? 'Còn kinh doanh' : 'Ngừng kinh doanh'}</td>
+                                            <td>{variation.isDelete === 1 ? 'Ngừng kinh doanh' : 'Còn kinh doanh'}</td>
                                             <td>
                                                 {variation.updatedAt
                                                     ? new Date(variation.updatedAt.replace(' ', 'T')).toLocaleString()

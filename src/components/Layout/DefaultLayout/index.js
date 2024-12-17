@@ -173,8 +173,8 @@ const App = ({ children }) => {
                             onClick={() => handleMenuItemClick('4')}
                             style={{ color: collapsed ? '#000' : textColor }}
                         >
-                            <Link to="/invoice" className={cx('text-Decoration_none')}>
-                                Đơn trả hàng
+                            <Link to="/return" className={cx('text-Decoration_none')}>
+                                Đơn đổi hàng
                             </Link>
                         </Menu.Item>
                         <Menu.Item

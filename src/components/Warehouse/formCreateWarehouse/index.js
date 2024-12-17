@@ -21,6 +21,7 @@ import { getAllCategoryAPI } from '~/apis/category';
 import { fetchProductByIdAPI, fetchProductByIdSupCategoryAPI } from '~/apis/ProductAPI';
 import { fecthShowAllSupplierAPI } from '~/apis/supplier';
 import { addNewWarehouseAPI } from '~/apis/warehoues';
+import { formatCurrency } from '~/utils/dateUtils';
 
 const cx = classNames.bind(styles);
 
@@ -41,6 +42,7 @@ function WarehouseCreate() {
 
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [quantity, setQuantity] = useState(0);
+    const [importPrice, setImportPrice] = useState(0);
     const [importedProducts, setImportedProducts] = useState([]);
 
     const [suppliers, setSupplier] = useState([]);
@@ -163,6 +165,7 @@ function WarehouseCreate() {
     };
 
     const handleImportStock = () => {
+        // Kiểm tra biến thể sản phẩm
         if (!variantInfo.variantCode) {
             notification.error({
                 message: 'Lỗi',
@@ -171,6 +174,7 @@ function WarehouseCreate() {
             return;
         }
 
+        // Kiểm tra số lượng nhập kho
         if (quantity <= 0) {
             notification.error({
                 message: 'Lỗi',
@@ -179,30 +183,40 @@ function WarehouseCreate() {
             return;
         }
 
+        // Tạo đối tượng sản phẩm nhập kho
         const importedProduct = {
             productName: productInfo.productName,
             productImage: productInfo.productImage,
             variantName: variantInfo.variantName,
             variantCode: variantInfo.variantCode,
-            quantity: quantity,
+            quantity: parseInt(quantity, 10),
+            importPrice: parseFloat(importPrice),
         };
+
         console.log('data ne:', importedProduct);
 
+        // Lấy dữ liệu từ localStorage
         const storedProducts = JSON.parse(localStorage.getItem('warehouseProducts')) || [];
 
+        // Tìm sản phẩm có cùng mã biến thể và cùng giá nhập
         const existingProductIndex = storedProducts.findIndex(
-            (product) => product.variantCode === variantInfo.variantCode,
+            (product) =>
+                product.variantCode === variantInfo.variantCode && product.importPrice === parseFloat(importPrice),
         );
 
         if (existingProductIndex !== -1) {
-            storedProducts[existingProductIndex].quantity =
-                parseInt(storedProducts[existingProductIndex].quantity, 10) + parseInt(quantity, 10);
+            // Nếu sản phẩm tồn tại với cùng giá nhập, tăng số lượng
+            storedProducts[existingProductIndex].quantity += parseInt(quantity, 10);
         } else {
+            // Nếu không, thêm sản phẩm mới
             storedProducts.push(importedProduct);
         }
 
+        // Cập nhật localStorage và state
         localStorage.setItem('warehouseProducts', JSON.stringify(storedProducts));
         setImportedProducts(storedProducts);
+
+        // Thông báo thành công
         notification.success({
             message: 'Thành công',
             description: 'Thêm sản phẩm thành công!',
@@ -232,6 +246,10 @@ function WarehouseCreate() {
         setQuantity(value);
     };
 
+    const handleImportPriceChange = (e) => {
+        const value = e.target.value;
+        setImportPrice(value);
+    };
     const handleSupplierChange = (value) => {
         console.log('Supplier: id', value);
         setSelectedSupplier(value);
@@ -244,7 +262,9 @@ function WarehouseCreate() {
     const handleQuantityUpdate = (e, record) => {
         const newQuantity = e.target.value;
         const updatedProducts = importedProducts.map((product) =>
-            product.productName === record.productName ? { ...product, quantity: newQuantity } : product,
+            product.variantCode === record.variantCode && product.importPrice === record.importPrice
+                ? { ...product, quantity: newQuantity }
+                : product,
         );
         setImportedProducts(updatedProducts);
         localStorage.setItem('warehouseProducts', JSON.stringify(updatedProducts));
@@ -261,7 +281,8 @@ function WarehouseCreate() {
             cancelText: 'Hủy',
             onOk: () => {
                 const updatedProducts = importedProducts.filter(
-                    (product) => product.variantCode !== record.variantCode,
+                    (product) =>
+                        product.variantCode !== record.variantCode || product.importPrice !== record.importPrice,
                 );
                 setImportedProducts(updatedProducts);
                 localStorage.setItem('warehouseProducts', JSON.stringify(updatedProducts));
@@ -288,9 +309,12 @@ function WarehouseCreate() {
             supplierId: SelectedSupplier,
             employeerId: user.id,
             orderDate: '2024-11-28',
+            totalPrice: totalAmount,
             items: dataItem.map((item) => ({
                 productVariationId: item.variantCode,
                 quantityOrdered: item.quantity,
+                unitPrice: item.importPrice,
+                amount: item.quantity * item.importPrice,
             })),
         };
 
@@ -319,6 +343,10 @@ function WarehouseCreate() {
             });
         }
     };
+
+    const totalAmount = importedProducts.reduce((sum, product) => {
+        return sum + product.quantity * product.importPrice;
+    }, 0);
 
     return (
         <Layout className={cx('container')}>
@@ -456,6 +484,17 @@ function WarehouseCreate() {
                                     <Input type="number" value={quantity} onChange={handleQuantityChange} min={1} />
                                 </Form.Item>
                             </Col>
+                            {/* giá nhập */}
+                            <Col span={4} className={cx('marginTop')}>
+                                <Form.Item label="Giá nhập" name="importPrice">
+                                    <Input
+                                        type="number"
+                                        value={importPrice}
+                                        onChange={handleImportPriceChange}
+                                        min={1}
+                                    />
+                                </Form.Item>
+                            </Col>
                             <Col spant={2} style={{ marginTop: 10 }}>
                                 <Button type="primary" onClick={handleImportStock}>
                                     Thêm
@@ -533,6 +572,19 @@ function WarehouseCreate() {
                                     ),
                                 },
                                 {
+                                    title: 'Giá nhập',
+                                    dataIndex: 'importPrice',
+                                    key: 'importPrice',
+                                },
+                                {
+                                    title: 'Thành tiền',
+                                    key: 'totalPrice',
+                                    render: (_, record) => {
+                                        const total = record.quantity * record.importPrice;
+                                        return <span>{formatCurrency(total)}</span>;
+                                    },
+                                },
+                                {
                                     title: 'Hành động',
                                     key: 'action',
                                     render: (text, record) => (
@@ -555,6 +607,9 @@ function WarehouseCreate() {
                         >
                             Tạo hóa đơn nhập hàng
                         </Button>
+                    </div>
+                    <div className={cx('total-amount')}>
+                        <Title level={5}>Tổng tiền: {formatCurrency(totalAmount)}</Title>
                     </div>
                 </div>
             </Content>
