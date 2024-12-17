@@ -2,10 +2,9 @@ import classNames from 'classnames/bind';
 import style from './ModelOrderSupplierDetail.module.scss';
 import { Modal, Button, Typography, Table, Row, Col, Tag, Input, notification } from 'antd';
 import Barcode from 'react-barcode';
-import { Box, padding } from '@mui/system';
+import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
-import { findByIdOrderSupplierAPI, updateOrderSupplierDetailsAPI } from '~/apis/warehoues';
-import htmlDocx from 'html-docx-js/dist/html-docx';
+import { findByIdOrderSupplierAPI, updateOrderSupplierDetailsAPI, updateStockWarehouseAPI } from '~/apis/warehoues';
 import 'jspdf-autotable';
 import { formatCurrency } from '~/utils/dateUtils';
 import UpdateWarehouse from '../UpdateWarehouse.js';
@@ -24,6 +23,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
 
     const [orderStatus, setOrderStatus] = useState('');
     const [paymentStatus, setPaymentStatus] = useState('');
+    const [inputQuantities, setInputQuantities] = useState({});
 
     useEffect(() => {
         setOrderStatus(invoiceDetails?.order_status);
@@ -36,40 +36,13 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
             fetchInvoiceData();
         }
     }, [open, invoiceDetails, isModalVisible]);
+    const handleInputChange = (e, orderDetailId) => {
+        const { value } = e.target;
 
-    const handlePrint = () => {
-        if (!invoiceDetails || !invoiceDetails.customerName || !invoiceDetails.invoice_id) {
-            console.error('Invoice details are missing!');
-            return;
-        }
-
-        if (!invoiceData || !Array.isArray(invoiceData) || invoiceData.length === 0) {
-            console.error('Invoice data is missing or empty!');
-            return;
-        }
-
-        const barcodeCanvas = document.createElement('canvas');
-
-        const barcode = new Barcode({
-            value: invoiceDetails.invoice_id,
-            width: 2,
-            height: 50,
-        });
-
-        barcode.render(barcodeCanvas);
-
-        const barcodeImgUrl = barcodeCanvas.toDataURL();
-
-        const invoiceHTML = `
-       
-        `;
-
-        const converted = htmlDocx.asBlob(invoiceHTML);
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(converted);
-        link.download = `${invoiceDetails.invoice_id}_invoice.docx`;
-        link.click();
+        setInputQuantities((prevQuantities) => ({
+            ...prevQuantities,
+            [orderDetailId]: value ? parseInt(value, 10) : null,
+        }));
     };
 
     const calculateTotalAmount = (data) => {
@@ -129,42 +102,50 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
             dataIndex: 'QuantityOrdered',
             key: 'QuantityOrdered',
         },
-        {
-            title: 'Số lượng nhập',
-            dataIndex: 'ImportQuantity',
-            key: 'ImportQuantity',
-            render: (text, record) => (
-                <Input
-                    value={text}
-                    onChange={(e) => handleQuantityChange(e, record.order_detail_id)}
-                    onBlur={(e) => handleBlurAmount(e, record.order_detail_id)} // Lưu lại sau khi nhập xong
-                    style={{ width: '100px' }}
-                />
-            ),
-        },
+
         {
             title: 'Đơn giá nhập',
             dataIndex: 'UnitPrice',
             key: 'UnitPrice',
-            render: (text, record) => (
-                <Input
-                    value={text}
-                    onChange={(e) => handlePriceChange(e, record.order_detail_id)}
-                    onBlur={(e) => handleBlurAmount(e, record.order_detail_id)} // Lưu lại sau khi nhập xong
-                    style={{ width: '100px' }}
-                />
-            ),
         },
         {
             title: 'Thành tiền',
             dataIndex: 'Amount',
             key: 'Amount',
+        },
+        {
+            title: 'Số lượng đã nhập',
+            dataIndex: 'ImportQuantity',
+            key: 'ImportQuantity',
+        },
+        {
+            title: 'Nhập số lượng',
+            key: 'updateQuantity',
             render: (text, record) => {
-                // Tính thành tiền
-                const amount = (record.ImportQuantity || 0) * (record.UnitPrice || 0);
-                return formatCurrency(amount);
+                const remainingQuantity = record.QuantityOrdered - record.ImportQuantity;
+
+                return (
+                    <Input
+                        type="number"
+                        min={0}
+                        max={remainingQuantity}
+                        value={inputQuantities[record.order_detail_id] ?? remainingQuantity} // Hiển thị số lượng cập nhật mới, mặc định là remainingQuantity
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '') {
+                                handleInputChange({ target: { value: null } }, record.order_detail_id);
+                            } else {
+                                const parsedValue = parseInt(value, 10);
+                                if (parsedValue >= 0 && parsedValue <= remainingQuantity) {
+                                    handleInputChange(e, record.order_detail_id);
+                                }
+                            }
+                        }}
+                    />
+                );
             },
         },
+
         {
             title: 'Cập nhật',
             key: 'update',
@@ -177,6 +158,20 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
     ];
 
     const handleUpdate = async (orderDetailId) => {
+        const updatedQuantity =
+            inputQuantities[orderDetailId] ??
+            invoiceData.find((item) => item.order_detail_id === orderDetailId)?.QuantityOrdered -
+                invoiceData.find((item) => item.order_detail_id === orderDetailId)?.ImportQuantity;
+
+        if (updatedQuantity === undefined) {
+            console.error('Số lượng nhập không hợp lệ');
+            notification.error({
+                message: 'Số lượng nhập không hợp lệ',
+                description: 'Vui lòng kiểm tra và nhập lại số lượng.',
+            });
+            return;
+        }
+
         const updatedDetail = invoiceData.find((item) => item.order_detail_id === orderDetailId);
 
         if (!updatedDetail) {
@@ -185,22 +180,24 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
         }
 
         const requestData = {
-            id: orderDetailId,
-            importQuantity: updatedDetail.ImportQuantity,
-            status: updatedDetail.status || 0,
-            unitPrice: updatedDetail.UnitPrice,
+            ID_Variation: updatedDetail.variation_id,
+            newStock: updatedQuantity,
+            orderID: updatedDetail.order_detail_id,
         };
-        console.log('Data id', invoiceDetails.id);
 
         try {
-            const response = await updateOrderSupplierDetailsAPI(requestData);
+            const response = await updateStockWarehouseAPI(requestData);
             console.log('Updated order supplier details:', response);
-
-            await UpdateTotalPriceOrderSupplierAPI(invoiceDetails.id);
-            fetchSupplierOrders();
             notification.success({
                 message: 'Cập nhật chi tiết đơn hàng thành công',
             });
+
+            setInputQuantities((prevQuantities) => ({
+                ...prevQuantities,
+                [orderDetailId]: 0,
+            }));
+
+            fetchInvoiceData();
         } catch (error) {
             console.error('Error updating order supplier details:', error);
             notification.error({
@@ -208,57 +205,6 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
                 description: 'Vui lòng thử lại sau.',
             });
         }
-    };
-
-    const updateTotalPrice = () => {
-        const totalAmount = invoiceData.reduce((total, item) => {
-            const amount = (item.ImportQuantity || 0) * (item.UnitPrice || 0);
-            return total + amount;
-        }, 0);
-
-        // Cập nhật lại tổng tiền của đơn hàng
-        setInvoiceData((prevData) => [
-            ...prevData,
-            { TotalPrice: totalAmount }, // Cập nhật tổng tiền vào dữ liệu
-        ]);
-    };
-
-    const handleQuantityChange = (e, orderDetailId) => {
-        const newValue = e.target.value;
-
-        setInvoiceData((prevData) =>
-            prevData.map((item) =>
-                item.order_detail_id === orderDetailId ? { ...item, ImportQuantity: newValue } : item,
-            ),
-        );
-
-        updateTotalPrice();
-    };
-
-    const handlePriceChange = (e, orderDetailId) => {
-        const newValue = e.target.value;
-
-        setInvoiceData((prevData) =>
-            prevData.map((item) => (item.order_detail_id === orderDetailId ? { ...item, UnitPrice: newValue } : item)),
-        );
-        updateTotalPrice();
-    };
-
-    const handleBlurAmount = (e, orderDetailId) => {
-        const rawValue = e.target.value.replace(/,/g, '');
-        setInvoiceData((prevData) =>
-            prevData.map((item) =>
-                item.order_detail_id === orderDetailId ? { ...item, Amount: formatCurrencyInput(rawValue) } : item,
-            ),
-        );
-    };
-
-    const formatCurrencyInput = (value) => {
-        if (!value) return '';
-        return Number(value).toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
     };
 
     const showModal = () => {
@@ -272,16 +218,6 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
     const handleUpdateStatus = () => {
         setIsModalVisible(true);
         console.log('Update status');
-    };
-
-    const updateTotalPriceInModal = () => {
-        const totalAmount = invoiceData.reduce((total, item) => {
-            const amount = (item.ImportQuantity || 0) * (item.UnitPrice || 0);
-            return total + amount;
-        }, 0);
-
-        // Cập nhật tổng tiền trong thông tin đơn hàng
-        setInvoiceData((prevData) => [...prevData, { TotalPrice: totalAmount }]);
     };
 
     return (
@@ -350,14 +286,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
                                             </Typography.Text>
                                             <br />
                                             <Typography.Text>
-                                                Tổng tiền: Tổng tiền:{' '}
-                                                {formatCurrency(
-                                                    invoiceData.reduce(
-                                                        (total, item) =>
-                                                            total + (item.ImportQuantity || 0) * (item.UnitPrice || 0),
-                                                        0,
-                                                    ),
-                                                )}
+                                                Tổng tiền: {formatCurrency(invoiceDetails.TotalPrice)}
                                             </Typography.Text>
 
                                             <Row justify="center" style={{ marginTop: 20 }}>

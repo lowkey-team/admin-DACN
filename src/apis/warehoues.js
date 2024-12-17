@@ -26,3 +26,7 @@ export const updateOrderSupplierDetailsAPI = async (fromData) => {
     const response = await axios.put(`${API_ROOT}/v1/orderSupplier/updateOrderDetail`, fromData);
     return response;
 };
+export const updateStockWarehouseAPI = async (fromData) => {
+    const response = await axios.post(`${API_ROOT}/v1/product/update-stock`, fromData);
+    return response;
+};
