@@ -1,0 +1,62 @@
+.wrapper {
+    padding: 20px;
+    background-color: #f9f9f9;
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        &__controls,
+        &__filters {
+            display: flex;
+            gap: 10px;
+
+            .form__select,
+            .form__input {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                width: 100%;
+            }
+        }
+    }
+
+    .title {
+        margin: 20px 0 10px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .product-list {
+        label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .product-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+
+           
+        }
+    }
+
+    .apply-btn {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 4px;
+        margin-top: 20px;
+
+        &:hover {
+            background-color: #218838;
+        }
+    }
+}

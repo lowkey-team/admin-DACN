@@ -18,6 +18,11 @@ export const fetchProductAllAPI = async () => {
     return response.data;
 };
 
+export const fetchProductsWithoutDiscountAPI = async () => {
+    const response = await axios.get(`${API_ROOT}/v1/product/getall/nodiscount`);
+    return response.data;
+};
+
 export const fetchCategoryAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/category`);
     return response.data;

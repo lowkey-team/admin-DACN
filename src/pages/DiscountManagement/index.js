@@ -1,19 +1,20 @@
+import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames/bind';
+import dayjs from 'dayjs';
 import { Dropdown, Menu, Pagination } from 'antd';
 import { DatePicker } from 'antd';
-import dayjs from 'dayjs';
-import styles from './Promotion.module.scss';
-import { useEffect, useState, useMemo } from 'react';
-import { getAllDiscountAPI } from '~/apis/Discount';
+
 import ProductDiscountTable from '~/components/Product/ProductDiscountTable';
 import ProductFilters from '~/components/Product/ProductFilters';
-import { fetchCategoryAPI, fetchProductAllAPI, fetchProductsWithoutDiscountAPI } from '~/apis/ProductAPI';
+import { getAllDiscountAPI } from '~/apis/Discount';
+import { fetchCategoryAPI, fetchProductAllAPI, fetchProductVariantsAPI } from '~/apis/ProductAPI';
 import { AddDiscountVariantAPI } from '~/apis/DiscountVariant';
+import styles from './DiscountManagement.module.scss';
 
 const cx = classNames.bind(styles);
 const { RangePicker } = DatePicker;
 
-function PromotionManagement() {
+function DiscountManagement() {
     const [inputValue, setInputValue] = useState(1);
     const [categories, setCategories] = useState([]);
     const [discounts, setDiscounts] = useState([]);
@@ -32,7 +33,7 @@ function PromotionManagement() {
     // Lấy dữ liệu sản phẩm
     const fetchData = async () => {
         try {
-            const data = await fetchProductsWithoutDiscountAPI();
+            const data = await fetchProductAllAPI();
             setRows(data || []);
         } catch (error) {
             console.error('Lỗi khi tải sản phẩm:', error);
@@ -124,6 +125,7 @@ function PromotionManagement() {
             try {
                 const response = await AddDiscountVariantAPI(formData);
                 console.log(`Giảm giá đã được áp dụng cho biến thể ${variation.variationId}:`, response.data);
+                fetchData();
             } catch (error) {
                 console.error('Lỗi khi áp dụng giảm giá cho biến thể', variation.variationId, error);
                 alert('Có lỗi xảy ra khi áp dụng giảm giá');
@@ -186,7 +188,7 @@ function PromotionManagement() {
     return (
         <div className={cx('wrapper', 'container')}>
             <div className={cx('row')}>
-                <div className={cx('col-md-8', 'left-action')}>
+                <div className={cx('col-md-10', 'left-action')}>
                     <div className={cx('select-percent')}>
                         <label>Chọn % giảm giá:</label>
                         <Dropdown overlay={menu}>
@@ -198,12 +200,9 @@ function PromotionManagement() {
                         <RangePicker presets={rangePresets} onChange={onRangeChange} />
                     </div>
                 </div>
-                <div className={cx('col-md-4', 'right-action')}>
+                <div className={cx('col-md-2', 'right-action')}>
                     <div className={cx('btn-confirm')}>
                         <button onClick={handleDiscountSubmit}>Xác nhận</button>
-                    </div>
-                    <div className={cx('btn-confirm')}>
-                        <button>Xem danh sách giảm giá</button>
                     </div>
                 </div>
             </div>
@@ -246,4 +245,4 @@ function PromotionManagement() {
     );
 }
 
-export default PromotionManagement;
+export default DiscountManagement;
