@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileInvoice } from '@fortawesome/free-solid-svg-icons';
 import { showAllOrderSupplierAPI } from '~/apis/warehoues';
 import ModelOrderSupplierDetail from '../ModelOrderSupplierDetail';
+import { useSelector } from 'react-redux';
 // import DialogInvoiceDetail from '../DialogInvoiceDetail';
 
 export default function SupplierOrderTable() {
@@ -17,6 +18,11 @@ export default function SupplierOrderTable() {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [supplierOrders, setSupplierOrders] = useState([]);
+
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canUpdateOrderImport = userPermissions.includes('Quản lý kho - Cập nhật đơn quản lý kho');
+    const canViewDetailOrderImport = userPermissions.includes('Quản lý kho - Xem chi tiết đơn quản lý kho');
 
     const fetchSupplierOrders = async () => {
         try {
@@ -51,14 +57,16 @@ export default function SupplierOrderTable() {
             { field: 'DateOfReceipt', headerName: 'Ngày Nhận', width: 180 },
             {
                 field: 'viewDetails',
-                headerName: 'Xem Chi Tiết',
+                headerName: '',
                 width: 120,
                 hide: !showDetailColumn,
-                renderCell: (params) => (
-                    <Button variant="contained" color="primary" onClick={() => openOrderDetailsDialog(params.row)}>
-                        <FontAwesomeIcon icon={faFileInvoice} />
-                    </Button>
-                ),
+                renderCell: (params) => {
+                    return canViewDetailOrderImport ? (
+                        <Button variant="contained" color="primary" onClick={() => openOrderDetailsDialog(params.row)}>
+                            <FontAwesomeIcon icon={faFileInvoice} />
+                        </Button>
+                    ) : null;
+                },
             },
         ];
 

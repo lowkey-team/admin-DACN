@@ -8,6 +8,7 @@ import { fecthInvoiceDetailListID_invoiceAPI } from '~/apis/invoice';
 import UpdateInvoice from '../UpdateInvoice.js';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import 'jspdf-autotable';
+import { useSelector } from 'react-redux';
 // import UpdateInvoice from '../UpdateInvoice.js';
 
 const cx = classNames.bind(style);
@@ -18,6 +19,10 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [orderStatus, setOrderStatus] = useState('');
     const [paymentStatus, setPaymentStatus] = useState('');
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canUpdateStatusInvoice = userPermissions.includes('Quản lý đơn hàng - Cập nhật trạng thái đơn hàng');
+    const canExportInvoice = userPermissions.includes('Quản lý đơn hàng - Xuất hóa đơn');
 
     const componentRef = useRef();
 
@@ -117,9 +122,9 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                             width: 50%;
                             text-align: right;
                         }
-    
+
                         .company-details {
-                            text-align: left; 
+                            text-align: left;
                             width: 50%;
                         }
                 </style>
@@ -130,13 +135,13 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                         <h2>THHH MỸ NGHỆ VIỆT</h2>
                         <p>Ngày: ${new Date().toLocaleDateString()}</p>
                     </div>
-                   
+
                 </div>
-    
+
                 <div class="invoice-title">
                     <p>HÓA ĐƠN BÁN HÀNG</p>
                 </div>
-    
+
                 <div>
                     <h3>Mã hóa đơn: ${invoiceDetails.invoice_id}</h3>
                     <h3>Khách hàng: ${invoiceDetails.customerName}</h3>
@@ -148,7 +153,7 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                     <p>Trạng thái đơn hàng: ${orderStatus || 'N/A'}</p>
                     <p>Trạng thái thanh toán: ${paymentStatus || 'N/A'}</p>
                 </div>
-    
+
                 <table class="invoice-table">
                     <thead>
                         <tr>
@@ -170,14 +175,14 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                             .join('')}
                     </tbody>
                 </table>
-    
+
                 <div class="invoice-total">
                     <p>Mã giảm giá: ${invoiceDetails.voucherCode || 'N/A'}</p>
                     <p>Số tiền gốc: ${invoiceDetails.totalAmount || 0}</p>
                     <p>Số tiền giảm: ${invoiceDetails.discountAmount || 0}</p>
                     <p>Số tiền sau khi giảm: ${invoiceDetails.finalAmount || 0}</p>
                 </div>
-    
+
                 <div>
                     <p>Cảm ơn quý khách đã mua hàng!</p>
                 </div>
@@ -403,9 +408,11 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                             </Col>
                         </Row>
                         <Row justify="center" style={{ marginTop: 20 }}>
-                            <Button type="primary" onClick={handleUpdateStatus} style={{ width: 200 }}>
-                                Cập nhật trạng thái đơn hàng
-                            </Button>
+                            {canUpdateStatusInvoice && (
+                                <Button type="primary" onClick={handleUpdateStatus} style={{ width: 200 }}>
+                                    Cập nhật trạng thái đơn hàng
+                                </Button>
+                            )}
                         </Row>
 
                         <UpdateInvoice
@@ -421,9 +428,11 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                         />
                     </Col>
 
-                    <Button type="primary" onClick={handlePrint} style={{ width: 200 }}>
-                        xuất hóa đơn
-                    </Button>
+                    {canExportInvoice && (
+                        <Button type="primary" onClick={handlePrint} style={{ width: 200 }}>
+                            xuất hóa đơn
+                        </Button>
+                    )}
                 </Row>
             ) : (
                 <Typography.Text>Không có thông tin chi tiết.</Typography.Text>

@@ -135,7 +135,7 @@ function RolesManagementPage() {
                                     <h4>Chức năng của quyền: {roles.find((role) => role.id === roleId)?.name}</h4>
                                     {permissions[roleId] &&
                                         Object.keys(permissions[roleId]).map((groupName) => (
-                                            <div key={groupName} className={cx('mt-3')}>
+                                            <div key={groupName} className={cx('mt-3', 'gr-premission')}>
                                                 <h5>{groupName}</h5>
                                                 <Checkbox.Group
                                                     value={permissions[roleId][groupName]

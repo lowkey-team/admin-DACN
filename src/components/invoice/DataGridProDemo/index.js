@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileInvoice } from '@fortawesome/free-solid-svg-icons';
 import { fetchInvoiceAllAPI } from '~/apis/ProductAPI';
 import DialogInvoiceDetail from '../DialogInvoiceDetail';
+import { useSelector } from 'react-redux';
 
 export default function InvoiceTable() {
     const [data, setData] = useState({ rows: [], columns: [] });
@@ -22,6 +23,11 @@ export default function InvoiceTable() {
     const [open, setOpen] = useState(false);
     const [invoiceDetails, setInvoiceDetails] = useState(null);
     const [showDetailColumn, setShowDetailColumn] = useState(false);
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canViewDetailInvoice = userPermissions.includes('Quản lý đơn hàng - Xem chi tiết hóa đơn');
+    const canDeleteCategory = userPermissions.includes('Quản lý đơn hàng - Cập nhật trạng thái đơn hàng');
+    const canAddSubCategory = userPermissions.includes('Quản lý đơn hàng - Xuất hóa đơn');
 
     const fetchData = async () => {
         try {
@@ -60,14 +66,16 @@ export default function InvoiceTable() {
             { field: 'createdAt', headerName: 'Ngày Tạo', width: 180 },
             {
                 field: 'viewDetails',
-                headerName: 'Xem Chi Tiết',
+                headerName: '',
                 width: 100,
                 hide: !showDetailColumn,
-                renderCell: (params) => (
-                    <Button variant="contained" color="primary" onClick={() => handleViewDetails(params.row)}>
-                        <FontAwesomeIcon icon={faFileInvoice} />
-                    </Button>
-                ),
+                renderCell: (params) => {
+                    return canViewDetailInvoice ? (
+                        <Button variant="contained" color="primary" onClick={() => handleViewDetails(params.row)}>
+                            <FontAwesomeIcon icon={faFileInvoice} />
+                        </Button>
+                    ) : null;
+                },
             },
         ];
 

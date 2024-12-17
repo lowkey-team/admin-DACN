@@ -9,6 +9,7 @@ import classNames from 'classnames/bind';
 import styles from './EmployeesManagement.module.scss';
 import ModalAddNewEmployees from '~/components/Modals/Employees/ModalAddEmployees';
 import ModalEmployeeDetail from '~/components/Modals/Employees/ModalEmployeeDetails';
+import { useSelector } from 'react-redux';
 const cx = classNames.bind(styles);
 
 function EmployeesManagement() {
@@ -16,6 +17,10 @@ function EmployeesManagement() {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
     const [isEmployeeDetailModalVisible, setIsEmployeeDetailModalVisible] = useState(false);
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canAddEmployee = userPermissions.includes('Quản lý nhân viên - Thêm nhân viên mới');
+    const canViewDetailEmployee = userPermissions.includes('Quản lý nhân viên - Xem chi tiết nhân viên');
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -109,13 +114,15 @@ function EmployeesManagement() {
         {
             title: 'Xem chi tiết',
             key: 'action',
-            render: (_, record) => (
-                <FontAwesomeIcon
-                    icon={faEye}
-                    style={{ cursor: 'pointer', color: '#1890ff' }}
-                    onClick={() => handleViewDetails(record.employeeId)}
-                />
-            ),
+            render: (_, record) => {
+                return canViewDetailEmployee ? (
+                    <FontAwesomeIcon
+                        icon={faEye}
+                        style={{ cursor: 'pointer', color: '#1890ff' }}
+                        onClick={() => handleViewDetails(record.employeeId)}
+                    />
+                ) : null;
+            },
         },
     ];
 
@@ -123,9 +130,11 @@ function EmployeesManagement() {
         <div className={cx('wrapper')}>
             <div className={cx('header-page')}>
                 <h2>Quản lý nhân viên</h2>
-                <button className={cx('btn-addEmpl')} onClick={showAddEmployeeModal}>
-                    + Thêm nhân viên mới
-                </button>
+                {canAddEmployee && (
+                    <button className={cx('btn-addEmpl')} onClick={showAddEmployeeModal}>
+                        + Thêm nhân viên mới
+                    </button>
+                )}
                 <ModalAddNewEmployees
                     visible={isAddEmployeeModalVisible}
                     onCancel={handleAddEmployeeModalCancel}

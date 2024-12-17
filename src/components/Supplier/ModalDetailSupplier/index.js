@@ -3,12 +3,17 @@ import { Modal, Form, Input, Button, message } from 'antd';
 import classNames from 'classnames/bind';
 import styles from './ModalDetailSupplier.module.scss';
 import { updateSupplierAPI, deleteSupplierAPI } from '~/apis/supplier';
+import { useSelector } from 'react-redux';
 
 const cx = classNames.bind(styles);
 
 function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, onDeleteSuccess }) {
     const [isEditing, setIsEditing] = useState(false);
-    const [form] = Form.useForm(); 
+    const [form] = Form.useForm();
+    const userPermissions = useSelector((state) => state.user.permissions);
+
+    const canEditSupplier = userPermissions.includes('Quản lý nhà cung cấp - Sửa thông tin nhà cung cấp');
+    const canDeleteSupplier = userPermissions.includes('Quản lý nhà cung cấp - Xóa nhà cung cấp');
 
     React.useEffect(() => {
         if (supplierDetails) {
@@ -31,7 +36,7 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
             cancelText: 'Hủy',
             onOk: async () => {
                 try {
-                    const values = await form.validateFields(); 
+                    const values = await form.validateFields();
                     const formData = {
                         SupplierName: values.SupplierName,
                         address: values.address,
@@ -39,12 +44,12 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
                         Email: values.Email,
                         contactPerson: values.contactPerson,
                     };
-                    console.log("Dữ liệu gửi đi khi cập nhật:", formData);
-    
+                    console.log('Dữ liệu gửi đi khi cập nhật:', formData);
+
                     const response = await updateSupplierAPI(supplierDetails.id, formData);
                     message.success('Cập nhật nhà cung cấp thành công!');
-                    onUpdateSuccess(response); 
-                    onClose(); 
+                    onUpdateSuccess(response);
+                    onClose();
                 } catch (error) {
                     console.error('Error updating supplier:', error);
                     // message.error('Đã xảy ra lỗi khi cập nhật nhà cung cấp.');
@@ -58,7 +63,7 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
             },
         });
     };
-    
+
     // Xử lý xóa nhà cung cấp
     const handleDelete = async () => {
         Modal.confirm({
@@ -68,7 +73,7 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
             cancelText: 'Hủy',
             onOk: async () => {
                 try {
-                    const response = await deleteSupplierAPI(supplierDetails.id); 
+                    const response = await deleteSupplierAPI(supplierDetails.id);
                     if (response) {
                         message.success('Nhà cung cấp đã được xóa!');
                         onDeleteSuccess(supplierDetails.id);
@@ -101,12 +106,12 @@ function ModalDetailSupplier({ open, onClose, supplierDetails, onUpdateSuccess, 
                         Cập Nhật
                     </Button>
                 ) : null,
-                !isEditing ? (
+                !isEditing && canEditSupplier ? (
                     <Button key="edit" onClick={() => setIsEditing(true)}>
                         Sửa
                     </Button>
                 ) : null,
-                !isEditing ? (
+                !isEditing && canDeleteSupplier ? (
                     <Button key="delete" type="danger" onClick={handleDelete}>
                         Xóa
                     </Button>
