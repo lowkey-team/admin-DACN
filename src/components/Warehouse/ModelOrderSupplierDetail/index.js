@@ -102,22 +102,33 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
             dataIndex: 'QuantityOrdered',
             key: 'QuantityOrdered',
         },
-
-        {
-            title: 'Đơn giá nhập',
-            dataIndex: 'UnitPrice',
-            key: 'UnitPrice',
-        },
-        {
-            title: 'Thành tiền',
-            dataIndex: 'Amount',
-            key: 'Amount',
-        },
         {
             title: 'Số lượng đã nhập',
             dataIndex: 'ImportQuantity',
             key: 'ImportQuantity',
         },
+
+        {
+            title: 'Đơn giá nhập',
+            dataIndex: 'UnitPrice',
+            key: 'UnitPrice',
+            render: (value) =>
+                new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                }).format(value),
+        },
+        {
+            title: 'Thành tiền',
+            dataIndex: 'Amount',
+            key: 'Amount',
+            render: (value) =>
+                new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                }).format(value),
+        },
+
         {
             title: 'Nhập số lượng',
             key: 'updateQuantity',
@@ -244,7 +255,7 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
                                             <Barcode className={cx('barcode-container')} value={invoiceDetails.id} />
                                         </Box>
                                         <Typography.Text>
-                                            Nhân viên tạo hóa đơn:{invoiceDetails.employee_name}
+                                            Nhân viên tạo hóa đơn: {invoiceDetails.employee_name}
                                             <br />
                                             Ngày tạo hóa đơn: {invoiceDetails.OrderDate}
                                             <br />
@@ -258,7 +269,14 @@ function ModelOrderSupplierDetail({ invoiceDetails, open, onClose, fetchSupplier
                                         <Typography.Text>
                                             SĐT Nhà cung cấp:{invoiceDetails.supplier_phone}{' '}
                                         </Typography.Text>
-                                        <Typography.Text>Ngày nhận: {invoiceDetails.DateOfReceipt} </Typography.Text>
+                                        <Typography.Text>
+                                            Ngày nhận:{' '}
+                                            {invoiceDetails.DateOfReceipt &&
+                                            new Date(invoiceDetails.DateOfReceipt).getTime() !==
+                                                new Date('1970-01-01T00:00:00Z').getTime()
+                                                ? invoiceDetails.DateOfReceipt
+                                                : ''}
+                                        </Typography.Text>
 
                                         <Typography.Text>
                                             Trạng thái đơn hàng:

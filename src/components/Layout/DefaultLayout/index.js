@@ -181,14 +181,6 @@ const App = ({ children }) => {
                                 Đơn đổi hàng
                             </Link>
                         </Menu.Item>
-                        <Menu.Item
-                            key="5"
-                            className={cx('custom-menu-item', { selected: selectedKey === '5' })}
-                            onClick={() => handleMenuItemClick('5')}
-                            style={{ color: collapsed ? '#000' : textColor }}
-                        >
-                            Tình trạng giao
-                        </Menu.Item>
                     </SubMenu>
 
                     {canViewCustomerListLayout && (

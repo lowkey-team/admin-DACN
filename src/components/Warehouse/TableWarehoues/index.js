@@ -6,6 +6,7 @@ import { faFileInvoice } from '@fortawesome/free-solid-svg-icons';
 import { showAllOrderSupplierAPI } from '~/apis/warehoues';
 import ModelOrderSupplierDetail from '../ModelOrderSupplierDetail';
 import { useSelector } from 'react-redux';
+import { formatCurrency } from '~/utils/dateUtils';
 // import DialogInvoiceDetail from '../DialogInvoiceDetail';
 
 export default function SupplierOrderTable() {
@@ -80,7 +81,6 @@ export default function SupplierOrderTable() {
             TotalPrice: order.TotalPrice,
             OrderDate: new Date(order.OrderDate).toLocaleString(),
             DateOfReceipt: new Date(order.DateOfReceipt).toLocaleString(),
-            TotalPrice: order.TotalPrice,
             order_status: order.order_status,
             payment_status: order.payment_status,
             OrderDate: new Date(order.OrderDate).toLocaleString(),
