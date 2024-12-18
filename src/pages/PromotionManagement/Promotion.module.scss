@@ -21,6 +21,7 @@
             background-color: transparent;
             border: 1px solid #333;
             transition: all .1s linear;
+            color: #333;
         }
     }
 
@@ -51,6 +52,7 @@
             background-color: rgb(135, 255, 215);
             border: 1px solid #333;
             transition: all .1s linear;
+            color: #333;
 
             &:hover {
                 background-color: #369ca7;

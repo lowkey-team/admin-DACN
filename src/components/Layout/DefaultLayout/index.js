@@ -12,6 +12,10 @@ import {
     CustomerServiceOutlined,
     LogoutOutlined,
     TagOutlined,
+    GiftOutlined,
+    ShopFilled,
+    ContainerOutlined,
+    SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme, Dropdown, message } from 'antd';
 import classNames from 'classnames/bind';
@@ -218,7 +222,7 @@ const App = ({ children }) => {
                     {canViewSupplierListLayout && (
                         <Menu.Item
                             key="17"
-                            icon={<TeamOutlined />}
+                            icon={<ShopFilled />}
                             className={cx('custom-menu-item', { selected: selectedKey === '17' })}
                             onClick={() => handleMenuItemClick('17')}
                             style={{ color: textColor }}
@@ -232,7 +236,7 @@ const App = ({ children }) => {
                     {canViewStockListLayout && (
                         <Menu.Item
                             key="18"
-                            icon={<TeamOutlined />}
+                            icon={<ContainerOutlined />}
                             className={cx('custom-menu-item', { selected: selectedKey === '18' })}
                             onClick={() => handleMenuItemClick('18')}
                             style={{ color: textColor }}
@@ -265,19 +269,21 @@ const App = ({ children }) => {
                     {canViewSupportLayout && (
                         <Menu.Item
                             key="11"
-                            icon={<CustomerServiceOutlined />}
+                            icon={<GiftOutlined />}
                             className={cx('custom-menu-item', { selected: selectedKey === '11' })}
                             onClick={() => handleMenuItemClick('11')}
                             style={{ color: textColor }}
                         >
-                            Hỗ trợ khách hàng
+                            <Link to="/vouchers" className={cx('text-Decoration_none')}>
+                                Voucher
+                            </Link>
                         </Menu.Item>
                     )}
 
                     {canViewPermissionLayout && (
                         <Menu.Item
                             key="113"
-                            icon={<CustomerServiceOutlined />}
+                            icon={<SafetyCertificateOutlined />}
                             className={cx('custom-menu-item', { selected: selectedKey === '113' })}
                             onClick={() => handleMenuItemClick('113')}
                             style={{ color: textColor }}
