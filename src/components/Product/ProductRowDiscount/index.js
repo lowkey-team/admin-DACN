@@ -66,11 +66,11 @@ export default function ProductRowDiscount({ row, initialOpen = false, onVariati
         <>
             <tr>
                 <td>
-                    <input
+                    {/* <input
                         type="checkbox"
                         checked={isProductChecked}
                         onChange={handleProductCheckboxChange}
-                    />
+                    /> */}
                 </td>
                 <td>
                     <IconButton

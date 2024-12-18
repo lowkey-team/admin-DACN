@@ -1,5 +1,8 @@
 import classNames from 'classnames/bind';
 import { Bar, Pie } from 'react-chartjs-2';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import * as XLSX from 'xlsx';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, ArcElement, Tooltip, Legend } from 'chart.js';
 import styles from './Overview.module.scss';
 import { useEffect, useState } from 'react';
@@ -11,6 +14,8 @@ import {
     productVariantRevenueAPI,
     totalRevenueAPI,
 } from '~/apis/Dashboard';
+import { fetchSalesReportAPI } from '~/apis/report';
+import { exportToExcelSALE } from '~/utils/excelUtils';
 
 const cx = classNames.bind(styles);
 
@@ -32,18 +37,41 @@ function Overview() {
         ],
     });
 
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [salesReport, setSalesReport] = useState([]);
+
+    const fetchSalesReport = async () => {
+        try {
+            const data = await fetchSalesReportAPI(
+                startDate.toISOString().split('T')[0],
+                endDate.toISOString().split('T')[0],
+            );
+            setSalesReport(data);
+        } catch (error) {
+            console.error('Lỗi khi tải dữ liệu báo cáo:', error);
+        }
+    };
+
+    const exportToExcel = () => {
+        const worksheet = XLSX.utils.json_to_sheet(salesReport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'SalesReport');
+        XLSX.writeFile(workbook, 'SalesReport.xlsx');
+    };
+
     useEffect(() => {
         const fetchPieChartData = async () => {
             try {
                 const data = await productVariantRevenueAPI();
                 console.log('Dữ liệu sản phẩm cho Pie Chart:', data.revenueData);
-    
+
                 const labels = data.revenueData.map((item) => `${item.productName} (${item.productSize})`);
                 const revenueData = data.revenueData.map((item) => parseFloat(item.totalRevenue));
                 const backgroundColors = data.revenueData.map(
-                    (_, index) => `hsl(${(index * 360) / data.revenueData.length}, 70%, 60%)`
+                    (_, index) => `hsl(${(index * 360) / data.revenueData.length}, 70%, 60%)`,
                 );
-    
+
                 setPieChartData({
                     labels: labels,
                     datasets: [
@@ -57,10 +85,9 @@ function Overview() {
                 console.error('Lỗi khi tải dữ liệu biểu đồ tròn:', error);
             }
         };
-    
+
         fetchPieChartData();
     }, []);
-    
 
     useEffect(() => {
         const fetchProductCount = async () => {
@@ -180,6 +207,53 @@ function Overview() {
                         <h3>Tỷ lệ sản phẩm bán chạy</h3>
                         <Pie data={pieChartData} />
                     </div>
+                </div>
+
+                <h2>Chọn ngày báo cáo</h2>
+                <div className={cx('date-picker')}>
+                    <div>
+                        <label>Ngày bắt đầu: </label>
+                        <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
+                    </div>
+                    <div>
+                        <label>Ngày kết thúc: </label>
+                        <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} />
+                    </div>
+                </div>
+
+                <div className={cx('btn__action')}>
+                    <button onClick={fetchSalesReport}>Lấy dữ liệu</button>
+                    <button onClick={() => exportToExcelSALE(salesReport)}>Xuất Excel</button>
+                </div>
+
+                <div className={cx('report-table')}>
+                    <h3>Báo cáo doanh thu</h3>
+                    {salesReport.length > 0 ? (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Biến thể</th>
+                                    <th>Số lượng đã bán</th>
+                                    <th>Giá bán</th>
+                                    <th>Tổng tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {salesReport.map((item, index) => (
+                                    <tr key={index}>
+                                        <td>{item.ProductName}</td>
+                                        <td>{item.VariantName}</td>
+                                        <td>{item.QuantitySold}</td>
+                                        <td>{parseFloat(item.SellingPrice).toLocaleString('de-DE')} VNĐ</td>
+                                        <td>{parseFloat(item.TotalAmount).toLocaleString('de-DE')} VNĐ</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>Không có dữ liệu.</p>
+                    )}
                 </div>
             </div>
         </div>

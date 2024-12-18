@@ -101,3 +101,75 @@ export const exportToExcel = (rows) => {
         link.click();
     });
 };
+
+export const exportToExcelSALE = async (salesReport) => {
+    try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('SalesReport');
+
+        // Thiết lập các cột với header và key
+        worksheet.columns = [
+            { header: 'Tên sản phẩm', key: 'ProductName', width: 30 },
+            { header: 'Biến thể', key: 'VariantName', width: 20 },
+            { header: 'Số lượng đã bán', key: 'QuantitySold', width: 15 },
+            { header: 'Giá bán', key: 'SellingPrice', width: 15 },
+            { header: 'Tổng tiền', key: 'TotalAmount', width: 15 },
+        ];
+
+        // Tô màu header
+        worksheet.getRow(1).eachCell((cell) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF4CAF50' }, // Màu xanh lá
+            };
+            cell.font = {
+                bold: true,
+                color: { argb: 'FFFFFFFF' }, // Màu chữ trắng
+            };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        });
+
+        // Thêm dữ liệu vào worksheet
+        salesReport.forEach((item) => {
+            worksheet.addRow({
+                ProductName: item.ProductName,
+                VariantName: item.VariantName,
+                QuantitySold: item.QuantitySold,
+                SellingPrice: item.SellingPrice,
+                TotalAmount: item.TotalAmount,
+            });
+        });
+
+        // Thêm viền cho tất cả các ô dữ liệu
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) {
+                // Bỏ qua header
+                row.eachCell({ includeEmpty: true }, (cell) => {
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' },
+                    };
+                });
+            }
+        });
+
+        // Xuất file Excel
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+
+        // Tạo link và download file
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'SalesReport.xlsx';
+        link.click();
+
+        console.log('Xuất file Excel thành công!');
+    } catch (error) {
+        console.error('Lỗi khi xuất file Excel:', error);
+    }
+};

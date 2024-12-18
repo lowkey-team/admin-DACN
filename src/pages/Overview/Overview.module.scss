@@ -36,51 +36,51 @@
 
         .overview-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
         }
-        
+
         .card {
             padding: 20px;
             border-radius: 12px;
             color: white;
             text-align: center;
-            background: linear-gradient(135deg, #6a11cb, #2575fc); 
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .card h3 {
             font-size: 1.2rem;
             margin-bottom: 15px;
             line-height: 1;
             margin: 0;
         }
-        
+
         .card p {
             font-size: 1.6rem;
             font-weight: bold;
             margin: 0;
         }
-        
+
         .card.products {
-            background: linear-gradient(135deg, #42a5f5, #478ed1); 
+            background: linear-gradient(135deg, #42a5f5, #478ed1);
         }
-        
+
         .card.orders {
             background: linear-gradient(135deg, #ff7043, #d84315);
         }
-        
+
         .card.customers {
-            background: linear-gradient(135deg, #66bb6a, #388e3c); 
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
         }
-        
+
         .card.revenue {
             background: linear-gradient(135deg, #f06292, #c2185b);
         }
-        
+
         .card:hover {
-            transform: translateY(-10px); 
+            transform: translateY(-10px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
@@ -118,7 +118,8 @@
                     width: 100%;
                     border-collapse: collapse;
 
-                    th, td {
+                    th,
+                    td {
                         padding: 10px;
                         text-align: left;
                         border-bottom: 1px solid #ddd;
@@ -129,6 +130,46 @@
                     }
                 }
             }
+        }
+    }
+}
+
+.date-picker {
+    display: flex;
+    align-items: center;
+    // border: 1px solid #333;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    label {
+        margin-right: 10px;
+    }
+}
+
+.btn__action{
+    display: flex;
+    gap: 20px;
+
+    button{
+        border-radius: 10px;
+    }
+}
+
+.report-table {
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: white;
         }
     }
 }
