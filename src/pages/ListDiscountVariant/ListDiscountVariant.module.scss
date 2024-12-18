@@ -1,0 +1,60 @@
+.wrapper {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+.btn__back{
+    border-radius: 10px;
+    background-color: #00aae2;
+}
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #ddd;
+
+    th,
+    td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background: #f2f2f2;
+        font-weight: bold;
+    }
+
+    tr:hover {
+        background: #f9f9f9;
+    }
+}
+
+.loading,
+.error,
+.empty {
+    font-size: 18px;
+    color: #555;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.delete-button {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #d9363e;
+    }
+}

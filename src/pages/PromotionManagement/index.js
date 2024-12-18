@@ -9,6 +9,7 @@ import ProductDiscountTable from '~/components/Product/ProductDiscountTable';
 import ProductFilters from '~/components/Product/ProductFilters';
 import { fetchCategoryAPI, fetchProductAllAPI, fetchProductsWithoutDiscountAPI } from '~/apis/ProductAPI';
 import { AddDiscountVariantAPI } from '~/apis/DiscountVariant';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 const { RangePicker } = DatePicker;
@@ -28,6 +29,11 @@ function PromotionManagement() {
     const [selectedVariations, setSelectedVariations] = useState([]); // Biến thể sản phẩm được chọn
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const navigate = useNavigate();
+
+    const handlelistdiscount = () => {
+        navigate('/listdiscountvariant');
+    };
 
     // Lấy dữ liệu sản phẩm
     const fetchData = async () => {
@@ -203,7 +209,7 @@ function PromotionManagement() {
                         <button onClick={handleDiscountSubmit}>Xác nhận</button>
                     </div>
                     <div className={cx('btn-confirm')}>
-                        <button>Xem danh sách giảm giá</button>
+                        <button onClick={handlelistdiscount}>Xem danh sách giảm giá</button>
                     </div>
                 </div>
             </div>

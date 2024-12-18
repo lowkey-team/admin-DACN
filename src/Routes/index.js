@@ -38,6 +38,7 @@ import RolesManagementPage from '~/pages/RolesManagementPage';
 import VoucherManagement from '~/pages/VoucherManagement';
 import DiscountManagement from '~/pages/DiscountManagement';
 import Return from '~/pages/Return';
+import ListDiscountVariant from '~/pages/ListDiscountVariant';
 
 const publicRoutes = [{ path: '/', component: Login, layout: null }];
 
@@ -59,6 +60,7 @@ const privateRoutes = [
     { path: '/employees', component: EmployeesManagement },
     { path: '/roles', component: RolesManagementPage },
     { path: '/vouchers', component: VoucherManagement },
+    { path: '/listdiscountvariant', component: ListDiscountVariant },
 ];
 
 export { publicRoutes, privateRoutes };
