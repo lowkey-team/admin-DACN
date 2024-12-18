@@ -20,6 +20,7 @@ const UpdateInvoice = ({
             invoiceId: invoice_id,
             paymentStatus: values.paymentStatus,
             orderStatus: values.orderStatus,
+            employeerId: 1,
         };
 
         try {

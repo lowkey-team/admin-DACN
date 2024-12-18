@@ -95,6 +95,8 @@ export default function InvoiceTable() {
             customerName: invoice.customerName || 'N/A',
             customerPhone: invoice.customerPhone || 'N/A',
             customerEmail: invoice.customerEmail || 'N/A',
+            employeeName: invoice.employeeName,
+            employeePhone: invoice.employeePhone,
 
             createdAt: new Date(invoice.createdAt).toLocaleString(),
         }));

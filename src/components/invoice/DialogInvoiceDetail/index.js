@@ -132,7 +132,7 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
             <body>
                 <div class="invoice-header">
                     <div class="company-info company-details">
-                        <h2>THHH MỸ NGHỆ VIỆT</h2>
+                        <h2>CTTNHH MỸ NGHỆ VIỆT</h2>
                         <p>Ngày: ${new Date().toLocaleDateString()}</p>
                     </div>
 
@@ -293,8 +293,8 @@ function DialogInvoiceDetail({ invoiceDetails, open, onClose, fetchData }) {
                                         />
                                     </Box>
                                     <Typography.Text>
-                                        {invoiceDetails.createdAt} - NV tư vấn: {invoiceDetails.staffName} -{' '}
-                                        {invoiceDetails.staffEmail}
+                                        {invoiceDetails.createdAt}
+                                        <br /> NV tư vấn: {invoiceDetails.employeeName} - {invoiceDetails.employeePhone}
                                     </Typography.Text>
                                 </Col>
                                 <Col span={12} className={cx('col-info')}>
