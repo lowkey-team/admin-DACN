@@ -8,6 +8,7 @@ import {
     countAllProductAPI,
     countNewCustomerAPI,
     monthlyRevenueAPI,
+    productVariantRevenueAPI,
     totalRevenueAPI,
 } from '~/apis/Dashboard';
 
@@ -15,22 +16,51 @@ const cx = classNames.bind(styles);
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, ArcElement, Tooltip, Legend);
 
-const pieChartData = {
-    labels: ['Sản phẩm A', 'Sản phẩm B', 'Sản phẩm C'],
-    datasets: [
-        {
-            data: [40, 30, 30],
-            backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56'],
-        },
-    ],
-};
-
 function Overview() {
     const [productCount, setProductCount] = useState(null);
     const [orderCount, setOrderCount] = useState(null);
     const [newCustomerCount, setNewCustomerCount] = useState(null);
     const [revenueTotal, setRevenueTotal] = useState(null);
     const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+    const [pieChartData, setPieChartData] = useState({
+        labels: [],
+        datasets: [
+            {
+                data: [],
+                backgroundColor: [],
+            },
+        ],
+    });
+
+    useEffect(() => {
+        const fetchPieChartData = async () => {
+            try {
+                const data = await productVariantRevenueAPI();
+                console.log('Dữ liệu sản phẩm cho Pie Chart:', data.revenueData);
+    
+                const labels = data.revenueData.map((item) => `${item.productName} (${item.productSize})`);
+                const revenueData = data.revenueData.map((item) => parseFloat(item.totalRevenue));
+                const backgroundColors = data.revenueData.map(
+                    (_, index) => `hsl(${(index * 360) / data.revenueData.length}, 70%, 60%)`
+                );
+    
+                setPieChartData({
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: revenueData,
+                            backgroundColor: backgroundColors,
+                        },
+                    ],
+                });
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu biểu đồ tròn:', error);
+            }
+        };
+    
+        fetchPieChartData();
+    }, []);
+    
 
     useEffect(() => {
         const fetchProductCount = async () => {

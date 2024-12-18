@@ -26,3 +26,8 @@ export const monthlyRevenueAPI = async () => {
     const response = await axios.get(`${API_ROOT}/v1/dashboard/monthlyrevenue`);
     return response.data;
 };
+
+export const productVariantRevenueAPI = async () => {
+    const response = await axios.get(`${API_ROOT}/v1/dashboard/product-variation-revenue`);
+    return response.data;
+};
